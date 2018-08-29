@@ -1,0 +1,8 @@
+#cmakedefine PLHOME    "@PLHOME@"
+#cmakedefine PLARCH    "@PLARCH@"
+#cmakedefine C_CC      "@C_CC@"
+#define C_LIBS         ""
+#define C_PLLIB        "-lswipl"
+#define C_LIBPLSO      ""
+#define C_CFLAGS       ""
+#define C_LDFLAGS      ""
