@@ -193,3 +193,8 @@ set_target_properties(libswipl PROPERTIES
 		      VERSION ${SWIPL_VERSION_STRING}
 		      SOVERSION ${SWIPL_VERSION_MAJOR})
 add_dependencies(libswipl version.h)
+
+# testing
+add_custom_target(check
+    COMMAND swipl -q -g test -t halt ${CMAKE_CURRENT_SOURCE_DIR}/test.pl
+)
