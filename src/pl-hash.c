@@ -9,7 +9,7 @@
 #define uintptr_t long
 #define DEBUG(l,g) (void)0
 #else
-#include <pl-incl.h>
+#include "pl-incl.h"
 #endif
 
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
