@@ -11,6 +11,8 @@ option(BUILD_SHARED_LIBS
 
 set(CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/cmake")
 
+include(Utils)
+
 include(CheckIncludeFile)
 include(CheckLibraryExists)
 include(CheckFunctionExists)
@@ -41,6 +43,17 @@ set(PLBASE ${CMAKE_INSTALL_PREFIX}/${PLDISTDIR})
 string(TOLOWER ${CMAKE_HOST_SYSTEM_PROCESSOR}-${CMAKE_HOST_SYSTEM_NAME} PLARCH)
 get_filename_component(PLHOME .. ABSOLUTE)
 set(PL_LIB_SRC_DIR ${PLHOME}/library)
+if(CMAKE_SIZEOF_VOID_P EQUAL 8)
+  set(PLBOOT_FILE "boot64.prc")
+else()
+  set(PLBOOT_FILE "boot32.prc")
+endif()
+
+include(Install)
+
+################
+# C files
+################
 
 set(SRC_OS os/pl-buffer.c os/pl-ctype.c os/pl-file.c os/pl-files.c
     os/pl-glob.c os/pl-os.c os/pl-stream.c os/pl-string.c os/pl-table.c
@@ -69,6 +82,13 @@ set(SRC_CORE pl-atom.c pl-wam.c pl-arith.c pl-bag.c pl-error.c
     minizip/zip.c minizip/unzip.c minizip/ioapi.c)
 
 set(HDR_CORE pl-atom.ih pl-funct.ih)
+
+set(SRC_LIB_SWIPL ${SRC_CORE} ${SRC_OS} ${SRC_TAI})
+set(SRC_SWIPL pl-main)
+
+################
+# Prolog files
+################
 
 set(PL_BOOT ../boot/syspred.pl ../boot/toplevel.pl ../boot/license.pl
     ../boot/bags.pl ../boot/apply.pl ../boot/expand.pl ../boot/dcg.pl
@@ -103,22 +123,19 @@ set(PL_LIB helpidx.pl help.pl explain.pl sort.pl
     lazy_lists.pl prolog_jiti.pl zip.pl obfuscate.pl)
 
 set(PL_LIB_CLP bounds.pl clp_events.pl clp_distinct.pl simplex.pl clpfd.pl clpb.pl)
-set(PL_LIB_DCG basics.pl)
-
-FUNCTION(PREPEND var prefix)
-   SET(listVar "")
-   FOREACH(f ${ARGN})
-      LIST(APPEND listVar "${prefix}/${f}")
-   ENDFOREACH(f)
-   SET(${var} "${listVar}" PARENT_SCOPE)
-ENDFUNCTION(PREPEND)
-
 prepend(PL_LIB_CLP clp/ ${PL_LIB_CLP})
+set(PL_LIB_DCG basics.pl)
 prepend(PL_LIB_DCG dcg/ ${PL_LIB_DCG})
-prepend(PL_LIB_SRC ${PL_LIB_SRC_DIR} ${PL_LIB} ${PL_LIB_CLP} ${PL_LIB_DCG})
 
-set(SRC_LIB_SWIPL ${SRC_CORE} ${SRC_OS} ${SRC_TAI})
-set(SRC_SWIPL pl-main)
+prepend(PL_LIB_FILES     ${PL_LIB_SRC_DIR} ${PL_LIB})
+prepend(PL_LIB_FILES_CLP ${PL_LIB_SRC_DIR} ${PL_LIB_CLP})
+prepend(PL_LIB_FILES_DCG ${PL_LIB_SRC_DIR} ${PL_LIB_DCG})
+set(PL_LIB_FILES_ALL ${PL_LIB_FILES} ${PL_LIB_FILES_CLP} ${PL_LIB_FILES_DCG})
+set(PL_LIB_INDEX ${PL_LIB_SRC_DIR}/INDEX.pl)
+
+################
+# Custom targets and commands
+################
 
 # FIXME: should we create these in the build directory?
 # FIXME: it is not allowed to have multiple OUTPUT that appear in
@@ -156,9 +173,9 @@ add_custom_command(
 )
 
 add_custom_command(
-    OUTPUT  ${PL_LIB_SRC_DIR}/INDEX.pl
+    OUTPUT  ${PL_LIB_INDEX}
     COMMAND swipl -f none -g "\"make_library_index(\'${PL_LIB_SRC_DIR}\')\"" -t halt
-    DEPENDS swipl.prc ${PL_LIB_SRC}
+    DEPENDS swipl.prc ${PL_LIB_FILES_ALL}
 )
 
 add_custom_target(prolog_products ALL
@@ -199,3 +216,29 @@ add_dependencies(libswipl version.h)
 add_custom_target(check
     COMMAND swipl -q -g test -t halt ${CMAKE_CURRENT_SOURCE_DIR}/test.pl
 )
+
+################
+# Installation
+################
+
+
+install(TARGETS swipl libswipl
+	RUNTIME DESTINATION lib/${PLDISTDIR}/bin/${PLARCH}
+        LIBRARY DESTINATION lib/${PLDISTDIR}/lib/${PLARCH}
+)
+install(FILES ${CMAKE_BINARY_DIR}/swipl.prc
+	DESTINATION lib/${PLDISTDIR}
+	RENAME ${PLBOOT_FILE}
+)
+install(CODE "MESSAGE(\"Installing the library.\")")
+install(FILES ${PL_LIB_FILES} DESTINATION lib/${PLDISTDIR}/library)
+install(FILES ${PL_LIB_FILES_CLP} DESTINATION lib/${PLDISTDIR}/library/clp)
+install(FILES ${PL_LIB_FILES_DCG} DESTINATION lib/${PLDISTDIR}/library/dcg)
+install(FILES ${PL_LIB_INDEX} DESTINATION lib/${PLDISTDIR}/library)
+install(CODE "file(WRITE ${CMAKE_INSTALL_PREFIX}/lib/${PLDISTDIR}/bin/swipl.home \"..\n\")")
+install(CODE "file(WRITE ${CMAKE_INSTALL_PREFIX}/lib/${PLDISTDIR}/swipl.home \".\n\")")
+
+# Create symbolic link from public installation dir to executables
+install(DIRECTORY DESTINATION bin)
+ilink(${CMAKE_INSTALL_PREFIX}/lib/${PLDISTDIR}/bin/${PLARCH}/swipl
+      ${CMAKE_INSTALL_PREFIX}/bin/swipl)
