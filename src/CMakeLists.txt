@@ -30,6 +30,7 @@ endif()
 
 include(Config)
 include(TestSignalType)
+include(TestSCNProcessors)
 
 # Populate parms.h
 set(C_CC     ${CMAKE_C_COMPILER})
