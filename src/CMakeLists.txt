@@ -203,6 +203,9 @@ endif()
 if(HAVE_LIB_M)
   target_link_libraries(swipl m)
 endif()
+if(HAVE_LIB_RT)
+  target_link_libraries(swipl rt)
+endif()
 
 # build the library
 add_library(libswipl ${SRC_LIB_SWIPL} ${HDR_CORE})

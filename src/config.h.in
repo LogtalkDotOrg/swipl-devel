@@ -267,3 +267,5 @@
 #cmakedefine pid_t @pid_t@
 #cmakedefine size_t @size_t@
 #cmakedefine vfork @vfork@
+
+#cmakedefine HAVE_PTHREAD_GETCPUCLOCKID
