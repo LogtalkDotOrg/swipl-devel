@@ -22,6 +22,7 @@ include(FindZLIB)
 include(FindGMP)
 
 include(Config)
+include(GCCBuiltins)
 include(TestSignalType)
 include(TestSCNProcessors)
 

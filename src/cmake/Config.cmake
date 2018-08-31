@@ -64,16 +64,20 @@ set(CMAKE_REQUIRED_LIBRARIES ${CMAKE_REQUIRED_LIBRARIES}
     ${CMAKE_THREAD_LIBS_INIT}
     ${GMP_LIBRARIES}
 )
+set(CMAKE_REQUIRED_INCLUDES math.h)
 
+# Misc
 check_function_exists(mmap HAVE_MMAP)
 check_function_exists(strerror HAVE_STRERROR)
 check_function_exists(poll HAVE_POLL)
 check_function_exists(popen HAVE_POPEN)
+check_function_exists(getpwnam HAVE_GETPWNAM)
 #check_function_exists(qsort_r HAVE_QSORT_R)
-#check_function_exists(qsort_s HAVE_QSORT_S)
+check_function_exists(qsort_s HAVE_QSORT_S)
 # files
 check_function_exists(access HAVE_ACCESS)
 check_function_exists(chmod HAVE_CHMOD)
+check_function_exists(fchmod HAVE_FCHMOD)
 check_function_exists(fcntl HAVE_FCNTL)
 check_function_exists(fstat HAVE_FSTAT)
 check_function_exists(ftruncate HAVE_FTRUNCATE)
@@ -84,7 +88,11 @@ check_function_exists(readlink HAVE_READLINK)
 check_function_exists(remove HAVE_REMOVE)
 check_function_exists(rename HAVE_RENAME)
 check_function_exists(stat HAVE_STAT)
-# locale
+# Strings and locale
+check_function_exists(memmove HAVE_MEMMOVE)
+check_function_exists(strcasecmp HAVE_STRCASECMP)
+check_function_exists(stricmp HAVE_STRICMP)
+check_function_exists(strlwr HAVE_STRLWR)
 check_function_exists(setlocale HAVE_SETLOCALE)
 check_function_exists(mbsnrtowcs HAVE_MBSNRTOWCS)
 check_function_exists(mbcasescoll HAVE_MBCASESCOLL)
@@ -120,9 +128,15 @@ check_function_exists(sgttyb HAVE_SGTTYB)
 check_function_exists(ceil HAVE_CEIL)
 check_function_exists(floor HAVE_FLOOR)
 check_function_exists(signbit HAVE_SIGNBIT)
+check_function_exists(srand HAVE_SRAND)
 check_function_exists(srandom HAVE_SRANDOM)
 check_function_exists(random HAVE_RANDOM)
 check_function_exists(rint HAVE_RINT)
+check_function_exists(fpclass HAVE_FPCLASS)
+check_function_exists(_fpclass HAVE_FPCLASS)
+# check_function_exists(fpclassify HAVE_FPCLASSIFY)
+check_function_exists(fpresetsticky HAVE_FPRESETSTICKY)
+check_function_exists(fpsetmask HAVE_FPSETMASK)
 # time and sleep
 check_function_exists(ftime HAVE_FTIME)
 check_function_exists(clock_gettime HAVE_CLOCK_GETTIME)
@@ -154,6 +168,9 @@ check_function_exists(pthread_timedjoin_np HAVE_PTHREAD_TIMEDJOIN_NP)
 check_function_exists(pthread_getcpuclockid HAVE_PTHREAD_GETCPUCLOCKID)
 check_function_exists(sched_setaffinity HAVE_SCHED_SETAFFINITY)
 check_function_exists(sema_init HAVE_SEMA_INIT)
+# Windows
+check_function_exists(WSAPoll HAVE_WSAPOLL)
+check_function_exists(WinExec HAVE_WINEXEC)
 
 check_symbol_exists(F_SETLKW fcntl.h HAVE_F_SETLKW)
 
@@ -175,3 +192,10 @@ endif()
 if(HAVE_F_SETLKW AND HAVE_FCNTL)
   set(FCNTL_LOCKS 1)
 endif()
+
+################
+# Stuff we do not need to define is below such that findmacros.pl does
+# not complain about them.
+
+# HAVE_VISITED
+# HAVE_SIGNALS
