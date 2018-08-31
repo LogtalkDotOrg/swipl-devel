@@ -1,21 +1,19 @@
 cmake_minimum_required(VERSION 3.4)
-project(SWI-Prolog)
-set(SWIPL_VERSION_MAJOR 7)
-set(SWIPL_VERSION_MINOR 7)
-set(SWIPL_VERSION_PATCH 19)
-set(SWIPL_VERSION_STRING ${SWIPL_VERSION_MAJOR}.${SWIPL_VERSION_MINOR}.${SWIPL_VERSION_PATCH})
+project(swipl)
 
 option(BUILD_SHARED_LIBS
        "Do (not) build shared libraries"
        ON)
 
-set(CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/cmake")
+set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
 
+include(Version)
 include(Utils)
 
 include(CheckIncludeFile)
 include(CheckLibraryExists)
 include(CheckFunctionExists)
+include(CheckSymbolExists)
 include(CheckTypeSize)
 include(CheckStructHasMember)
 
@@ -23,31 +21,38 @@ include(FindThreads)
 include(FindZLIB)
 include(FindGMP)
 
-if(${CMAKE_USE_PTHREADS_INIT})
-  set(O_PLMT 1)
-endif()
-if(${GMP_FOUND})
-  set(HAVE_GMP_H 1)
-endif()
-
 include(Config)
 include(TestSignalType)
 include(TestSCNProcessors)
 
+# Source locations
+get_filename_component(SWIPL_ROOT "${CMAKE_CURRENT_SOURCE_DIR}/.." ABSOLUTE)
+set(SWIPL_LIBRARY_ROOT ${SWIPL_ROOT}/library)
+set(SWIPL_BOOT_ROOT ${SWIPL_ROOT}/boot)
+
+# Installation locations
+string(TOLOWER ${CMAKE_HOST_SYSTEM_PROCESSOR}-${CMAKE_HOST_SYSTEM_NAME}
+       SWIPL_ARCH)
+
+set(SWIPL_INSTALL_DIR swipl)
+set(SWIPL_INSTALL_PREFIX ${CMAKE_INSTALL_PREFIX}/lib/${SWIPL_INSTALL_DIR})
+set(SWIPL_INSTALL_ARCH_EXE ${SWIPL_INSTALL_PREFIX}/bin/${SWIPL_ARCH})
+set(SWIPL_INSTALL_ARCH_LIB ${SWIPL_INSTALL_PREFIX}/lib/${SWIPL_ARCH})
+set(SWIPL_INSTALL_LIBRARY  ${SWIPL_INSTALL_PREFIX}/library)
+set(SWIPL_INSTALL_BOOT     ${SWIPL_INSTALL_PREFIX}/boot)
+set(SWIPL_INSTALL_INCLUDE  ${SWIPL_INSTALL_PREFIX}/include)
+
+if(CMAKE_SIZEOF_VOID_P EQUAL 8)
+  set(SWIPL_BOOT_FILE "boot64.prc")
+else()
+  set(SWIPL_BOOT_FILE "boot32.prc")
+endif()
+
 # Populate parms.h
 set(C_CC     ${CMAKE_C_COMPILER})
 set(C_CFLAGS ${CMAKE_C_FLAGS})
-
-set(PLDISTDIR swipl)
-set(PLBASE ${CMAKE_INSTALL_PREFIX}/${PLDISTDIR})
-string(TOLOWER ${CMAKE_HOST_SYSTEM_PROCESSOR}-${CMAKE_HOST_SYSTEM_NAME} PLARCH)
-get_filename_component(PLHOME .. ABSOLUTE)
-set(PL_LIB_SRC_DIR ${PLHOME}/library)
-if(CMAKE_SIZEOF_VOID_P EQUAL 8)
-  set(PLBOOT_FILE "boot64.prc")
-else()
-  set(PLBOOT_FILE "boot32.prc")
-endif()
+set(PLHOME   ${SWIPL_INSTALL_PREFIX})
+set(PLARCH   ${SWIPL_ARCH})
 
 include(Install)
 
@@ -55,16 +60,19 @@ include(Install)
 # C files
 ################
 
-set(SRC_OS os/pl-buffer.c os/pl-ctype.c os/pl-file.c os/pl-files.c
-    os/pl-glob.c os/pl-os.c os/pl-stream.c os/pl-string.c os/pl-table.c
-    os/pl-text.c os/pl-utf8.c os/pl-fmt.c os/pl-dtoa.c os/pl-option.c
-    os/pl-cstack.c os/pl-codelist.c os/pl-prologflag.c
-    os/pl-tai.c os/pl-locale.c)
+set(SRC_OS pl-buffer.c pl-ctype.c pl-file.c pl-files.c pl-glob.c pl-os.c
+    pl-stream.c pl-string.c pl-table.c pl-text.c pl-utf8.c pl-fmt.c
+    pl-dtoa.c pl-option.c pl-cstack.c pl-codelist.c pl-prologflag.c pl-tai.c
+    pl-locale.c)
+prepend(SRC_OS os/ ${SRC_OS})
 
-set(SRC_TAI libtai/caltime_utc libtai/caltime_tai libtai/leapsecs_sub
-    libtai/leapsecs_add libtai/caldate_fmjd libtai/caldate_mjd
-    libtai/leapsecs_init libtai/leapsecs_read libtai/tai_pack
-    libtai/tai_unpack)
+set(SRC_TAI caltime_utc caltime_tai leapsecs_sub leapsecs_add
+    caldate_fmjd caldate_mjd leapsecs_init leapsecs_read tai_pack
+    tai_unpack)
+prepend(SRC_TAI libtai/ ${SRC_TAI})
+
+set(SRC_MINIZIP zip.c unzip.c ioapi.c)
+prepend(SRC_MINIZIP minizip/ ${SRC_MINIZIP})
 
 set(SRC_CORE pl-atom.c pl-wam.c pl-arith.c pl-bag.c pl-error.c
     pl-comp.c pl-zip.c pl-dwim.c pl-ext.c pl-flag.c
@@ -78,25 +86,22 @@ set(SRC_CORE pl-atom.c pl-wam.c pl-arith.c pl-bag.c pl-error.c
     pl-version.c pl-codetable.c pl-supervisor.c
     pl-dbref.c pl-termhash.c pl-variant.c pl-assert.c
     pl-copyterm.c pl-debug.c pl-cont.c pl-ressymbol.c pl-dict.c
-    pl-trie.c pl-indirect.c pl-tabling.c pl-rsort.c pl-mutex.c
-    minizip/zip.c minizip/unzip.c minizip/ioapi.c)
+    pl-trie.c pl-indirect.c pl-tabling.c pl-rsort.c pl-mutex.c)
 
 set(HDR_CORE pl-atom.ih pl-funct.ih)
 
-set(SRC_LIB_SWIPL ${SRC_CORE} ${SRC_OS} ${SRC_TAI})
-set(SRC_SWIPL pl-main)
+set(LIBSWIPL_SRC ${SRC_CORE} ${SRC_OS} ${SRC_TAI} ${SRC_MINIZIP})
+set(SWIPL_SRC pl-main.c)
 
 ################
 # Prolog files
 ################
 
-set(PL_BOOT ../boot/syspred.pl ../boot/toplevel.pl ../boot/license.pl
-    ../boot/bags.pl ../boot/apply.pl ../boot/expand.pl ../boot/dcg.pl
-    ../boot/history.pl ../boot/attvar.pl ../boot/packs.pl
-    ../boot/dwim.pl ../boot/rc.pl ../boot/predopts.pl
-    ../boot/parms.pl ../boot/autoload.pl ../boot/qlf.pl
-    ../boot/topvars.pl ../boot/messages.pl ../boot/load.pl
-    ../boot/dicts.pl ../boot/engines.pl ../boot/iri.pl ../boot/tabling.pl)
+set(SWIPL_BOOT_FILES syspred.pl toplevel.pl license.pl bags.pl apply.pl
+    expand.pl dcg.pl history.pl attvar.pl packs.pl dwim.pl rc.pl predopts.pl
+    parms.pl autoload.pl qlf.pl topvars.pl messages.pl load.pl dicts.pl
+    engines.pl iri.pl tabling.pl)
+prepend(SWIPL_BOOT_FILES ${SWIPL_BOOT_ROOT} ${SWIPL_BOOT_FILES})
 
 set(PL_LIB helpidx.pl help.pl explain.pl sort.pl
     qsave.pl shlib.pl statistics.pl system.pl error.pl
@@ -122,16 +127,18 @@ set(PL_LIB helpidx.pl help.pl explain.pl sort.pl
     solution_sequences.pl iostream.pl dicts.pl yall.pl tabling.pl
     lazy_lists.pl prolog_jiti.pl zip.pl obfuscate.pl)
 
-set(PL_LIB_CLP bounds.pl clp_events.pl clp_distinct.pl simplex.pl clpfd.pl clpb.pl)
+set(PL_LIB_CLP bounds.pl clp_events.pl clp_distinct.pl simplex.pl
+    clpfd.pl clpb.pl)
 prepend(PL_LIB_CLP clp/ ${PL_LIB_CLP})
+
 set(PL_LIB_DCG basics.pl)
 prepend(PL_LIB_DCG dcg/ ${PL_LIB_DCG})
 
-prepend(PL_LIB_FILES     ${PL_LIB_SRC_DIR} ${PL_LIB})
-prepend(PL_LIB_FILES_CLP ${PL_LIB_SRC_DIR} ${PL_LIB_CLP})
-prepend(PL_LIB_FILES_DCG ${PL_LIB_SRC_DIR} ${PL_LIB_DCG})
+prepend(PL_LIB_FILES     ${SWIPL_LIBRARY_ROOT} ${PL_LIB})
+prepend(PL_LIB_FILES_CLP ${SWIPL_LIBRARY_ROOT} ${PL_LIB_CLP})
+prepend(PL_LIB_FILES_DCG ${SWIPL_LIBRARY_ROOT} ${PL_LIB_DCG})
 set(PL_LIB_FILES_ALL ${PL_LIB_FILES} ${PL_LIB_FILES_CLP} ${PL_LIB_FILES_DCG})
-set(PL_LIB_INDEX ${PL_LIB_SRC_DIR}/INDEX.pl)
+set(PL_LIB_INDEX ${SWIPL_LIBRARY_ROOT}/INDEX.pl)
 
 ################
 # Custom targets and commands
@@ -168,31 +175,32 @@ add_custom_target(
 
 add_custom_command(
     OUTPUT  swipl.prc
-    COMMAND swipl -O -b ${PLHOME}/boot/init.pl
-    DEPENDS swipl ${PL_BOOT}
+    COMMAND swipl -O -b ${SWIPL_BOOT_ROOT}/init.pl
+    DEPENDS swipl ${SWIPL_BOOT_FILES}
 )
 
 add_custom_command(
     OUTPUT  ${PL_LIB_INDEX}
-    COMMAND swipl -f none -g "\"make_library_index(\'${PL_LIB_SRC_DIR}\')\"" -t halt
+    COMMAND swipl -f none -g "\"make_library_index(\'${SWIPL_LIBRARY_ROOT}\')\"" -t halt
     DEPENDS swipl.prc ${PL_LIB_FILES_ALL}
 )
 
 add_custom_target(prolog_products ALL
-    DEPENDS swipl.prc ${PL_LIB_SRC_DIR}/INDEX.pl
+    DEPENDS swipl.prc ${PL_LIB_INDEX}
 )
 
-configure_file(config.h.in config.h)
-configure_file(parms.h.in parms.h)
-include_directories(BEFORE ${CMAKE_BINARY_DIR})
-include_directories(BEFORE ${CMAKE_SOURCE_DIR})
+configure_file(config.h.cmake config.h)
+configure_file(parms.h.cmake parms.h)
+file(WRITE "${CMAKE_CURRENT_BINARY_DIR}/../swipl.home" "${SWIPL_ROOT}\n")
+include_directories(BEFORE ${CMAKE_CURRENT_BINARY_DIR})
+include_directories(BEFORE ${CMAKE_CURRENT_SOURCE_DIR})
 
 # build helpers
 add_executable(mkvmi mkvmi.c)
 add_executable(defatom defatom.c)
 
 # build swipl
-add_executable(swipl ${SRC_SWIPL})
+add_executable(swipl ${SWIPL_SRC})
 target_link_libraries(swipl libswipl
 		      ${ZLIB_LIBRARIES}
 		      ${GMP_LIBRARIES}
@@ -208,7 +216,7 @@ if(HAVE_LIB_RT)
 endif()
 
 # build the library
-add_library(libswipl ${SRC_LIB_SWIPL} ${HDR_CORE})
+add_library(libswipl ${LIBSWIPL_SRC} ${HDR_CORE})
 set_target_properties(libswipl PROPERTIES
 		      OUTPUT_NAME swipl
 		      VERSION ${SWIPL_VERSION_STRING}
@@ -224,24 +232,28 @@ add_custom_target(check
 # Installation
 ################
 
-
 install(TARGETS swipl libswipl
-	RUNTIME DESTINATION lib/${PLDISTDIR}/bin/${PLARCH}
-        LIBRARY DESTINATION lib/${PLDISTDIR}/lib/${PLARCH}
+	RUNTIME DESTINATION ${SWIPL_INSTALL_ARCH_EXE}
+        LIBRARY DESTINATION ${SWIPL_INSTALL_ARCH_LIB}
 )
-install(FILES ${CMAKE_BINARY_DIR}/swipl.prc
-	DESTINATION lib/${PLDISTDIR}
-	RENAME ${PLBOOT_FILE}
+install(FILES ${CMAKE_CURRENT_BINARY_DIR}/swipl.prc
+	DESTINATION ${SWIPL_INSTALL_PREFIX}
+	RENAME ${SWIPL_BOOT_FILE}
 )
 install(CODE "MESSAGE(\"Installing the library.\")")
-install(FILES ${PL_LIB_FILES} DESTINATION lib/${PLDISTDIR}/library)
-install(FILES ${PL_LIB_FILES_CLP} DESTINATION lib/${PLDISTDIR}/library/clp)
-install(FILES ${PL_LIB_FILES_DCG} DESTINATION lib/${PLDISTDIR}/library/dcg)
-install(FILES ${PL_LIB_INDEX} DESTINATION lib/${PLDISTDIR}/library)
-install(CODE "file(WRITE ${CMAKE_INSTALL_PREFIX}/lib/${PLDISTDIR}/bin/swipl.home \"..\n\")")
-install(CODE "file(WRITE ${CMAKE_INSTALL_PREFIX}/lib/${PLDISTDIR}/swipl.home \".\n\")")
+install(FILES ${PL_LIB_FILES}     DESTINATION ${SWIPL_INSTALL_LIBRARY})
+install(FILES ${PL_LIB_FILES_CLP} DESTINATION ${SWIPL_INSTALL_LIBRARY}/clp)
+install(FILES ${PL_LIB_FILES_DCG} DESTINATION ${SWIPL_INSTALL_LIBRARY}/dcg)
+install(FILES ${PL_LIB_INDEX}     DESTINATION ${SWIPL_INSTALL_LIBRARY})
+install(FILES ${SWIPL_BOOT_FILES} DESTINATION ${SWIPL_INSTALL_BOOT})
+install(FILES
+	${CMAKE_CURRENT_SOURCE_DIR}/SWI-Prolog.h
+	${CMAKE_CURRENT_SOURCE_DIR}/os/SWI-Stream.h
+	DESTINATION ${SWIPL_INSTALL_INCLUDE})
+install(CODE "file(WRITE ${SWIPL_INSTALL_PREFIX}/bin/swipl.home \"..\n\")")
+install(CODE "file(WRITE ${SWIPL_INSTALL_PREFIX}/swipl.home \".\n\")")
 
 # Create symbolic link from public installation dir to executables
 install(DIRECTORY DESTINATION bin)
-ilink(${CMAKE_INSTALL_PREFIX}/lib/${PLDISTDIR}/bin/${PLARCH}/swipl
+ilink(${SWIPL_INSTALL_ARCH_EXE}/swipl
       ${CMAKE_INSTALL_PREFIX}/bin/swipl)

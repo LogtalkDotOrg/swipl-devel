@@ -155,9 +155,23 @@ check_function_exists(pthread_getcpuclockid HAVE_PTHREAD_GETCPUCLOCKID)
 check_function_exists(sched_setaffinity HAVE_SCHED_SETAFFINITY)
 check_function_exists(sema_init HAVE_SEMA_INIT)
 
+check_symbol_exists(F_SETLKW fcntl.h HAVE_F_SETLKW)
+
 check_struct_has_member("struct tm" tm_gmtoff time.h HAVE_STRUCT_TIME_TM_GMTOFF)
 check_struct_has_member("struct stat" st_mtim stat.h HAVE_STRUCT_STAT_ST_MTIM)
 
+################
+# Set of features compatible with the old config tools
+
 if(HAVE_CLOCK_GETTIME AND HAVE_PTHREAD_GETCPUCLOCKID)
   set(PTHREAD_CPUCLOCKS 1)
+endif()
+if(CMAKE_USE_PTHREADS_INIT)
+  set(O_PLMT 1)
+endif()
+if(GMP_FOUND)
+  set(HAVE_GMP_H 1)
+endif()
+if(HAVE_F_SETLKW AND HAVE_FCNTL)
+  set(FCNTL_LOCKS 1)
 endif()

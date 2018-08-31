@@ -269,3 +269,4 @@
 #cmakedefine vfork @vfork@
 
 #cmakedefine HAVE_PTHREAD_GETCPUCLOCKID
+#cmakedefine HAVE_F_SETLKW
