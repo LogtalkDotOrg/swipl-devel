@@ -2,7 +2,11 @@ cmake_minimum_required(VERSION 3.0)
 project(SWI-Prolog)
 
 # Default location to install SWI-Prolog (for now)
-set(CMAKE_INSTALL_PREFIX $ENV{HOME}/cmake)
+if(IS_DIRECTORY "$ENV{SWIPL_INSTALL_PREFIX}")
+  set(CMAKE_INSTALL_PREFIX $ENV{SWIPL_INSTALL_PREFIX})
+  message("-- Using install prefix \"${CMAKE_INSTALL_PREFIX}\"")
+endif()
+
 # Default build target
 set(CMAKE_BUILD_TYPE RelWithDebInfo)
 set(CMAKE_C_FLAGS_RELWITHDEBINFO "-O2 -gdwarf-2 -g3 -Wall")
