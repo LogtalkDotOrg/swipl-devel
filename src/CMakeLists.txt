@@ -15,6 +15,7 @@ include(CheckLibraryExists)
 include(CheckFunctionExists)
 include(CheckSymbolExists)
 include(CheckTypeSize)
+include(AlignOf)
 include(CheckStructHasMember)
 
 include(FindThreads)
@@ -206,13 +207,13 @@ target_link_libraries(swipl libswipl
 		      ${ZLIB_LIBRARIES}
 		      ${GMP_LIBRARIES}
 		      ${CMAKE_THREAD_LIBS_INIT})
-if(HAVE_LIB_DL)
+if(HAVE_LIBDL)
   target_link_libraries(swipl dl)
 endif()
-if(HAVE_LIB_M)
+if(HAVE_LIBM)
   target_link_libraries(swipl m)
 endif()
-if(HAVE_LIB_RT)
+if(HAVE_LIBRT)
   target_link_libraries(swipl rt)
 endif()
 

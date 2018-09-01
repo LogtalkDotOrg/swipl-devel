@@ -252,7 +252,6 @@
 #cmakedefine SO_pic @SO_pic@
 #cmakedefine STACK_DIRECTION @STACK_DIRECTION@
 #cmakedefine STDC_HEADERS @STDC_HEADERS@
-#cmakedefine TAGGED_LVALUE @TAGGED_LVALUE@
 #cmakedefine TIME_WITH_SYS_TIME @TIME_WITH_SYS_TIME@
 #cmakedefine UNION_WAIT @UNION_WAIT@
 #cmakedefine USE_COPY_STACK_SIZE @USE_COPY_STACK_SIZE@

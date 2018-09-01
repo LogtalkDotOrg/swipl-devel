@@ -1,5 +1,4 @@
 # Compiler features
-#check_function_exists(__sync_add_and_fetch HAVE___SYNC_ADD_AND_FETCH)
 
 check_c_source_compiles(
     "unsigned int x = 11; int main() { return __builtin_clz(x); }"
@@ -28,3 +27,12 @@ check_c_source_compiles(
 check_c_source_compiles(
     "static inline foo() { return 0; } int main() { return foo(); }"
     HAVE_INLINE)
+
+# Builtin functions that lead to conflicts
+
+check_c_source_compiles(
+    "int main() { char *s = alloca(10); return s!=0; }"
+    HAVE_ALLOCA)
+check_c_source_compiles(
+    "#include <math.h>\nint main() { double x; return signbit(x); }"
+    HAVE_SIGNBIT)

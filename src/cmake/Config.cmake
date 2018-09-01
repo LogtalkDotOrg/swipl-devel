@@ -1,3 +1,7 @@
+check_include_file(inttypes.h HAVE_INTTYPES_H)
+check_include_file(stdlib.h HAVE_STDLIB_H)
+check_include_file(strings.h HAVE_STRINGS_H)
+check_include_file(wchar.h HAVE_WCHAR_H)
 check_include_file(alloca.h HAVE_ALLOCA_H)
 check_include_file(curses.h HAVE_CURSES_H)
 check_include_file(dirent.h HAVE_DIRENT_H)
@@ -22,6 +26,7 @@ check_include_file(siginfo.h HAVE_SIGINFO_H)
 check_include_file(signal.h HAVE_SIGNAL_H)
 check_include_file(string.h HAVE_STRING_H)
 check_include_file(sys/dir.h HAVE_SYS_DIR_H)
+check_include_file(sys/file.h HAVE_SYS_FILE_H)
 check_include_file(sys/mman.h HAVE_SYS_MMAN_H)
 check_include_file(sys/ndir.h HAVE_SYS_NDIR_H)
 check_include_file(sys/param.h HAVE_SYS_PARAM_H)
@@ -41,30 +46,56 @@ check_include_file(valgrind/valgrind.h HAVE_VALGRIND_VALGRIND_H)
 check_include_file(vfork.h HAVE_VFORK_H)
 check_include_file(mach/thread_act.h HAVE_MACH_THREAD_ACT_H)
 
-check_library_exists(dl dlopen	      "" HAVE_LIB_DL)
-check_library_exists(m  sin           "" HAVE_LIB_M)
-check_library_exists(rt clock_gettime "" HAVE_LIB_RT)
+check_library_exists(dl dlopen	      "" HAVE_LIBDL)
+check_library_exists(m  sin           "" HAVE_LIBM)
+check_library_exists(rt clock_gettime "" HAVE_LIBRT)
 
-check_type_size("int" SIZEOF_INT)
-check_type_size("long" SIZEOF_LONG)
-check_type_size("void *" SIZEOF_VOIDP)
-check_type_size("long long int" SIZEOF_LONG_LONG)
-check_type_size("wchar_t" SIZEOF_WCHAR_T)
-
-if(HAVE_LIB_DL)
+if(HAVE_LIBDL)
 set(CMAKE_REQUIRED_LIBRARIES ${CMAKE_REQUIRED_LIBRARIES} dl)
 endif()
-if(HAVE_LIB_M)
+if(HAVE_LIBM)
 set(CMAKE_REQUIRED_LIBRARIES ${CMAKE_REQUIRED_LIBRARIES} m)
 endif()
-if(HAVE_LIB_RT)
+if(HAVE_LIBRT)
 set(CMAKE_REQUIRED_LIBRARIES ${CMAKE_REQUIRED_LIBRARIES} rt)
 endif()
 set(CMAKE_REQUIRED_LIBRARIES ${CMAKE_REQUIRED_LIBRARIES}
     ${CMAKE_THREAD_LIBS_INIT}
     ${GMP_LIBRARIES}
 )
-set(CMAKE_REQUIRED_INCLUDES math.h)
+
+set(CMAKE_REQUIRED_INCLUDES ${CMAKE_REQUIRED_INCLUDES} ${GMP_INCLUDE_DIRS})
+
+set(CMAKE_EXTRA_INCLUDE_FILES ${CMAKE_EXTRA_INCLUDE_FILES} math.h)
+if(GMP_FOUND)
+  set(CMAKE_EXTRA_INCLUDE_FILES ${CMAKE_EXTRA_INCLUDE_FILES} gmp.h)
+endif()
+
+#if(CMAKE_C_COMPILER_ID STREQUAL "GNU")
+#  set(CMAKE_REQUIRED_FLAGS ${CMAKE_REQUIRED_FLAGS} -Wno-builtin-declaration-mismatch)
+#endif()
+
+################
+# Types
+
+check_type_size("int" SIZEOF_INT)
+check_type_size("long" SIZEOF_LONG)
+check_type_size("void *" SIZEOF_VOIDP)
+check_type_size("long long int" SIZEOF_LONG_LONG)
+check_type_size("wchar_t" SIZEOF_WCHAR_T)
+check_type_size("mp_bitcnt_t" SIZEOF_MP_BITCNT_T)
+
+if(NOT SIZEOF_MP_BITCNT_T STREQUAL "")
+  set(HAVE_MP_BITCNT_T 1)
+endif()
+
+alignof(int64_t c ALIGNOF_INT64_T)
+alignof(double c ALIGNOF_DOUBLE)
+alignof("void*" c ALIGNOF_VOIDP)
+
+
+################
+# Functions
 
 # Misc
 check_function_exists(mmap HAVE_MMAP)
@@ -72,8 +103,11 @@ check_function_exists(strerror HAVE_STRERROR)
 check_function_exists(poll HAVE_POLL)
 check_function_exists(popen HAVE_POPEN)
 check_function_exists(getpwnam HAVE_GETPWNAM)
+check_function_exists(fork HAVE_FORK)
+check_function_exists(vfork HAVE_VFORK)
 #check_function_exists(qsort_r HAVE_QSORT_R)
 check_function_exists(qsort_s HAVE_QSORT_S)
+check_function_exists(getpagesize HAVE_GETPAGESIZE)
 # files
 check_function_exists(access HAVE_ACCESS)
 check_function_exists(chmod HAVE_CHMOD)
@@ -107,6 +141,7 @@ check_function_exists(setenv HAVE_SETENV)
 check_function_exists(putenv HAVE_PUTENV)
 check_function_exists(unsetenv HAVE_UNSETENV)
 check_function_exists(sysconf HAVE_SYSCONF)
+check_function_exists(confstr HAVE_CONFSTR)
 check_function_exists(getrlimit HAVE_GETRLIMIT)
 check_function_exists(getrusage HAVE_GETRUSAGE)
 # dynamic linking
@@ -116,18 +151,24 @@ check_function_exists(dladdr HAVE_DLADDR)
 # signals
 check_function_exists(signal HAVE_SIGNAL)
 check_function_exists(sigprocmask HAVE_SIGPROCMASK)
+check_function_exists(sigsetmask HAVE_SIGSETMASK)
+check_function_exists(siggetmask HAVE_SIGGETMASK)
 check_function_exists(sigaction HAVE_SIGACTION)
+check_function_exists(sigset HAVE_SIGSET)
+check_function_exists(sigblock HAVE_SIGBLOCK)
 check_function_exists(kill HAVE_KILL)
 check_function_exists(backtrace HAVE_BACKTRACE)
+# Allocation
+check_function_exists(mtrace HAVE_MTRACE)
 # terminal
 check_function_exists(tgetent HAVE_TGETENT)
 check_function_exists(tcsetattr HAVE_TCSETATTR)
 check_function_exists(grantpt HAVE_GRANTPT)
 check_function_exists(sgttyb HAVE_SGTTYB)
+check_function_exists(cfmakeraw HAVE_CFMAKERAW)
 # math
 check_function_exists(ceil HAVE_CEIL)
 check_function_exists(floor HAVE_FLOOR)
-check_function_exists(signbit HAVE_SIGNBIT)
 check_function_exists(srand HAVE_SRAND)
 check_function_exists(srandom HAVE_SRANDOM)
 check_function_exists(random HAVE_RANDOM)
@@ -137,6 +178,8 @@ check_function_exists(_fpclass HAVE_FPCLASS)
 # check_function_exists(fpclassify HAVE_FPCLASSIFY)
 check_function_exists(fpresetsticky HAVE_FPRESETSTICKY)
 check_function_exists(fpsetmask HAVE_FPSETMASK)
+check_function_exists(isnan HAVE_ISNAN)
+check_function_exists(isinf HAVE_ISINF)
 # time and sleep
 check_function_exists(ftime HAVE_FTIME)
 check_function_exists(clock_gettime HAVE_CLOCK_GETTIME)
@@ -144,6 +187,7 @@ check_function_exists(gettimeofday HAVE_GETTIMEOFDAY)
 check_function_exists(localtime_r HAVE_LOCALTIME_R)
 check_function_exists(localtime_s HAVE_LOCALTIME_S)
 check_function_exists(ctime_r HAVE_CTIME_R)
+check_function_exists(asctime_r HAVE_ASCTIME_R)
 check_function_exists(nanosleep HAVE_NANOSLEEP)
 check_function_exists(sleep HAVE_SLEEP)
 check_function_exists(usleep HAVE_USLEEP)
@@ -168,14 +212,25 @@ check_function_exists(pthread_timedjoin_np HAVE_PTHREAD_TIMEDJOIN_NP)
 check_function_exists(pthread_getcpuclockid HAVE_PTHREAD_GETCPUCLOCKID)
 check_function_exists(sched_setaffinity HAVE_SCHED_SETAFFINITY)
 check_function_exists(sema_init HAVE_SEMA_INIT)
+check_function_exists(sem_init HAVE_SEM_INIT)
 # Windows
 check_function_exists(WSAPoll HAVE_WSAPOLL)
 check_function_exists(WinExec HAVE_WINEXEC)
 
 check_symbol_exists(F_SETLKW fcntl.h HAVE_F_SETLKW)
+check_symbol_exists(timezone time.h HAVE_VAR_TIMEZONE)
 
 check_struct_has_member("struct tm" tm_gmtoff time.h HAVE_STRUCT_TIME_TM_GMTOFF)
 check_struct_has_member("struct stat" st_mtim stat.h HAVE_STRUCT_STAT_ST_MTIM)
+check_struct_has_member("struct rusage" ru_idrss sys/resource.h HAVE_RU_IDRSS)
+
+# GMP
+# check_function_exists(gmp_randinit_mt HAVE_GMP_RANDINIT_MT)
+# Requires <gmp.h> as this is a macro
+check_c_source_compiles(
+    "#include <gmp.h>\nint main() { gmp_randinit_mt(0); return 0;}"
+    HAVE_GMP_RANDINIT_MT)
+
 
 ################
 # Set of features compatible with the old config tools
@@ -199,3 +254,4 @@ endif()
 
 # HAVE_VISITED
 # HAVE_SIGNALS
+# HAVE_SIGINFO  (no longer used; may be deleted)
