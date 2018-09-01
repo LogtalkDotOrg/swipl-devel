@@ -105,7 +105,7 @@ check_function_exists(popen HAVE_POPEN)
 check_function_exists(getpwnam HAVE_GETPWNAM)
 check_function_exists(fork HAVE_FORK)
 check_function_exists(vfork HAVE_VFORK)
-#check_function_exists(qsort_r HAVE_QSORT_R)
+check_function_exists(qsort_r HAVE_QSORT_R)
 check_function_exists(qsort_s HAVE_QSORT_S)
 check_function_exists(getpagesize HAVE_GETPAGESIZE)
 # files
@@ -230,6 +230,10 @@ check_struct_has_member("struct rusage" ru_idrss sys/resource.h HAVE_RU_IDRSS)
 check_c_source_compiles(
     "#include <gmp.h>\nint main() { gmp_randinit_mt(0); return 0;}"
     HAVE_GMP_RANDINIT_MT)
+
+if(HAVE_QSORT_R)
+  include(TestGNUQsortR)
+endif()
 
 
 ################
