@@ -223,6 +223,7 @@ check_function_exists(WinExec HAVE_WINEXEC)
 
 check_symbol_exists(F_SETLKW fcntl.h HAVE_F_SETLKW)
 check_symbol_exists(timezone time.h HAVE_VAR_TIMEZONE)
+check_symbol_exists(SIGPROF signal.h HAVE_SIGPROF)
 
 check_struct_has_member("struct tm" tm_gmtoff time.h HAVE_STRUCT_TIME_TM_GMTOFF)
 check_struct_has_member("struct stat" st_mtim stat.h HAVE_STRUCT_STAT_ST_MTIM)
@@ -257,6 +258,9 @@ if(GMP_FOUND)
 endif()
 if(HAVE_F_SETLKW AND HAVE_FCNTL)
   set(FCNTL_LOCKS 1)
+endif()
+if(HAVE_SIGPROF)
+  set(O_SIGPROF_PROFILE 1)
 endif()
 
 ################
