@@ -27,6 +27,9 @@ check_c_source_compiles(
 check_c_source_compiles(
     "static inline foo() { return 0; } int main() { return foo(); }"
     HAVE_INLINE)
+check_c_source_compiles(
+    "int main() { void *p = &&lbl; goto *p; lbl: return 0; }"
+    O_LABEL_ADDRESSES)
 
 # Builtin functions that lead to conflicts
 
