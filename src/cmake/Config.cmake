@@ -46,6 +46,7 @@ check_include_file(valgrind/valgrind.h HAVE_VALGRIND_VALGRIND_H)
 check_include_file(vfork.h HAVE_VFORK_H)
 check_include_file(mach/thread_act.h HAVE_MACH_THREAD_ACT_H)
 check_include_file(sys/stropts.h HAVE_SYS_STROPTS_H)
+check_include_file(zlib.h HAVE_ZLIB_H)
 
 check_library_exists(dl dlopen	      "" HAVE_LIBDL)
 check_library_exists(m  sin           "" HAVE_LIBM)
@@ -262,10 +263,13 @@ endif()
 if(HAVE_SIGPROF)
   set(O_SIGPROF_PROFILE 1)
 endif()
+if(HAVE_READLINK)
+  set(HAVE_SYMLINKS 1)
+endif()
 
 ################
 # Stuff we do not need to define is below such that findmacros.pl does
 # not complain about them.
 
-# HAVE_VISITED
-# HAVE_SIGNALS
+# HAVE_VISITED (locally defined and used)
+# HAVE_SIGNALS (locally defined and used)
