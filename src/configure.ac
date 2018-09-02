@@ -1706,16 +1706,6 @@ AC_TRY_COMPILE(
 fi
 
 
-AC_MSG_CHECKING("for type uchar")
-AC_TRY_COMPILE(
-[
-#include <sys/types.h>
-typedef unsigned char uchar;
-],
-[;], AC_DEFINE(NEED_UCHAR, 1, Define if uchar is not defined in <sys/types.h>)
-     AC_MSG_RESULT("need typedef uchar"),
-     AC_MSG_RESULT("uchar predefined"))
-
 AC_MSG_CHECKING("whether we need extern int errno")
 AC_TRY_COMPILE(
 [
