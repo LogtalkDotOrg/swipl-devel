@@ -21,6 +21,7 @@ include(CheckStructHasMember)
 include(FindThreads)
 include(FindZLIB)
 include(FindGMP)
+include(FindCurses)
 
 include(Config)
 include(GCCBuiltins)
@@ -204,6 +205,7 @@ add_executable(defatom defatom.c)
 # build swipl
 add_executable(swipl ${SWIPL_SRC})
 target_link_libraries(swipl libswipl
+		      ${CURSES_LIBRARIES}
 		      ${ZLIB_LIBRARIES}
 		      ${GMP_LIBRARIES}
 		      ${CMAKE_THREAD_LIBS_INIT})
