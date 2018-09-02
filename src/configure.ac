@@ -1848,17 +1848,6 @@ AC_TRY_COMPILE(
 	     [Define if wait() uses union wait]),
    AC_MSG_RESULT(no))
 
-AC_MSG_CHECKING("for tagged lvalues")
-AC_TRY_COMPILE(
-[
-],
-[ int x;
-  *(char *)&x = 'a';
-  exit(0);
-], AC_DEFINE(TAGGED_LVALUE, 1, [Define if (type)var = value is allowed])
-   AC_MSG_RESULT(yes),
-   AC_MSG_RESULT(no))
-
 AC_MSG_CHECKING("for label addresses")
 AC_TRY_COMPILE(
 [
