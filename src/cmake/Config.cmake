@@ -259,4 +259,3 @@ endif()
 
 # HAVE_VISITED
 # HAVE_SIGNALS
-# HAVE_RLIM_T   (no longer used; may be deleted)

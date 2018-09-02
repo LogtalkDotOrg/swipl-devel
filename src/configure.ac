@@ -1644,21 +1644,6 @@ AC_LINK_IFELSE([AC_LANG_PROGRAM(
      [ AC_MSG_RESULT(no)
      ])
 
-if test "$ac_cv_func_getrlimit" = "yes"; then
-AC_MSG_CHECKING("type rlim_t")
-AC_TRY_COMPILE(
-[
-#include <sys/types.h>
-#include <sys/time.h>
-#include <sys/resource.h>
-],
-[ rlim_t datasize;
-], AC_DEFINE(HAVE_RLIM_T, 1,
-	     [Define if the type rlim_t is defined by <sys/resource.h>])
-   AC_MSG_RESULT(yes),
-   AC_MSG_RESULT(no))
-fi
-
 if test "$ac_cv_func_getrusage" = "yes"; then
 AC_MSG_CHECKING("ru_idrss in struct rusage")
 AC_TRY_COMPILE(
