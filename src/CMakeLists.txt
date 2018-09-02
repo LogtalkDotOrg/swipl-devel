@@ -28,6 +28,11 @@ include(GCCBuiltins)
 include(TestSignalType)
 include(TestSCNProcessors)
 
+# FIXME: Is this still needed?
+if(CMAKE_C_COMPILER_ID STREQUAL "GNU")
+  add_compile_options(-fno-strict-aliasing)
+endif()
+
 # Source locations
 get_filename_component(SWIPL_ROOT "${CMAKE_CURRENT_SOURCE_DIR}/.." ABSOLUTE)
 set(SWIPL_LIBRARY_ROOT ${SWIPL_ROOT}/library)
@@ -50,12 +55,6 @@ if(CMAKE_SIZEOF_VOID_P EQUAL 8)
 else()
   set(SWIPL_BOOT_FILE "boot32.prc")
 endif()
-
-# Populate parms.h
-set(C_CC     ${CMAKE_C_COMPILER})
-set(C_CFLAGS ${CMAKE_C_FLAGS})
-set(PLHOME   ${SWIPL_INSTALL_PREFIX})
-set(PLARCH   ${SWIPL_ARCH})
 
 include(Install)
 
@@ -184,7 +183,7 @@ add_custom_command(
 
 add_custom_command(
     OUTPUT  ${PL_LIB_INDEX}
-    COMMAND swipl -f none -g "\"make_library_index(\'${SWIPL_LIBRARY_ROOT}\')\"" -t halt
+    COMMAND swipl -f none -g "\"make_library_index('${SWIPL_LIBRARY_ROOT}')\"" -t halt
     DEPENDS swipl.prc ${PL_LIB_FILES_ALL}
 )
 
@@ -193,44 +192,52 @@ add_custom_target(prolog_products ALL
 )
 
 configure_file(config.h.cmake config.h)
-configure_file(parms.h.cmake parms.h)
 file(WRITE "${CMAKE_CURRENT_BINARY_DIR}/../swipl.home" "${SWIPL_ROOT}\n")
-include_directories(BEFORE ${CMAKE_CURRENT_BINARY_DIR})
-include_directories(BEFORE ${CMAKE_CURRENT_SOURCE_DIR})
 
 # build helpers
 add_executable(mkvmi mkvmi.c)
 add_executable(defatom defatom.c)
 
-# build swipl
-add_executable(swipl ${SWIPL_SRC})
-target_link_libraries(swipl libswipl
-		      ${CURSES_LIBRARIES}
-		      ${ZLIB_LIBRARIES}
-		      ${GMP_LIBRARIES}
-		      ${CMAKE_THREAD_LIBS_INIT})
+# Establish libraries
+set(LIBSWIPL_LIBRARIES
+    ${CURSES_LIBRARIES}
+    ${ZLIB_LIBRARIES}
+    ${GMP_LIBRARIES}
+    ${CMAKE_THREAD_LIBS_INIT})
 if(HAVE_LIBDL)
-  target_link_libraries(swipl dl)
+  set(LIBSWIPL_LIBRARIES ${LIBSWIPL_LIBRARIES} dl)
 endif()
 if(HAVE_LIBM)
-  target_link_libraries(swipl m)
+  set(LIBSWIPL_LIBRARIES ${LIBSWIPL_LIBRARIES} m)
 endif()
 if(HAVE_LIBRT)
-  target_link_libraries(swipl rt)
+  set(LIBSWIPL_LIBRARIES ${LIBSWIPL_LIBRARIES} rt)
 endif()
+
+# build swipl
+add_executable(swipl ${SWIPL_SRC})
+target_link_libraries(swipl libswipl)
 
 # build the library
 add_library(libswipl ${LIBSWIPL_SRC} ${HDR_CORE})
+add_dependencies(libswipl version.h)
 set_target_properties(libswipl PROPERTIES
 		      OUTPUT_NAME swipl
 		      VERSION ${SWIPL_VERSION_STRING}
 		      SOVERSION ${SWIPL_VERSION_MAJOR})
-add_dependencies(libswipl version.h)
+target_include_directories(libswipl BEFORE PRIVATE
+			   ${CMAKE_CURRENT_BINARY_DIR}
+			   ${CMAKE_CURRENT_SOURCE_DIR})
+target_link_libraries(libswipl ${LIBSWIPL_LIBRARIES})
 
 # testing
 add_custom_target(check
     COMMAND swipl -q -g test -t halt ${CMAKE_CURRENT_SOURCE_DIR}/test.pl
 )
+
+# Populate parms.h, making the compilation environment known to Prolog
+include(Params)
+configure_file(parms.h.cmake parms.h)
 
 ################
 # Installation

@@ -9,7 +9,14 @@ endif()
 
 # Default build target
 set(CMAKE_BUILD_TYPE RelWithDebInfo)
-set(CMAKE_C_FLAGS_RELWITHDEBINFO "-O2 -gdwarf-2 -g3 -Wall")
+set(CMAKE_C_FLAGS_RELWITHDEBINFO "-O2 -gdwarf-2 -g3")
+set(CMAKE_C_FLAGS_RELEASE "-O2")
+
+if(MSVC)
+  add_compile_options(/W3)
+else()
+  add_compile_options(-Wall)
+endif()
 
 set(SWIPL_PACKAGE_LIST
     libedit
