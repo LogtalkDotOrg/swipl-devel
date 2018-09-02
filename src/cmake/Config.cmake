@@ -228,7 +228,7 @@ check_symbol_exists(timezone time.h HAVE_VAR_TIMEZONE)
 check_symbol_exists(SIGPROF signal.h HAVE_SIGPROF)
 
 check_struct_has_member("struct tm" tm_gmtoff time.h HAVE_STRUCT_TIME_TM_GMTOFF)
-check_struct_has_member("struct stat" st_mtim stat.h HAVE_STRUCT_STAT_ST_MTIM)
+check_struct_has_member("struct stat" st_mtim sys/stat.h HAVE_STRUCT_STAT_ST_MTIM)
 check_struct_has_member("struct rusage" ru_idrss sys/resource.h HAVE_RU_IDRSS)
 
 # GMP
