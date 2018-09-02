@@ -5,7 +5,7 @@ option(BUILD_SHARED_LIBS
        "Do (not) build shared libraries"
        ON)
 
-set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
+set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_CURRENT_SOURCE_DIR}/../cmake")
 
 include(Version)
 include(Utils)
