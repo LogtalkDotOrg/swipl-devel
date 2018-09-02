@@ -214,6 +214,7 @@ check_function_exists(pthread_setname_np HAVE_PTHREAD_SETNAME_NP)
 check_function_exists(pthread_sigmask HAVE_PTHREAD_SIGMASK)
 check_function_exists(pthread_timedjoin_np HAVE_PTHREAD_TIMEDJOIN_NP)
 check_function_exists(pthread_getcpuclockid HAVE_PTHREAD_GETCPUCLOCKID)
+check_function_exists(pthread_attr_setstacksize HAVE_PTHREAD_ATTR_SETSTACKSIZE)
 check_function_exists(sched_setaffinity HAVE_SCHED_SETAFFINITY)
 check_function_exists(sema_init HAVE_SEMA_INIT)
 check_function_exists(sem_init HAVE_SEM_INIT)
@@ -242,6 +243,10 @@ if(HAVE_QSORT_R)
   include(TestGNUQsortR)
 endif()
 
+if(HAVE_SIGNAL AND NOT HAVE_SIGACTION)
+  include(TestBSDSignals)
+endif()
+
 
 ################
 # Set of features compatible with the old config tools
@@ -251,6 +256,9 @@ if(HAVE_CLOCK_GETTIME AND HAVE_PTHREAD_GETCPUCLOCKID)
 endif()
 if(CMAKE_USE_PTHREADS_INIT)
   set(O_PLMT 1)
+  if(HAVE_GETRLIMIT AND HAVE_PTHREAD_ATTR_SETSTACKSIZE)
+    set(USE_COPY_STACK_SIZE 1)
+  endif()
 endif()
 if(HAVE_PTHREAD_MUTEX_RECURSIVE_NP OR HAVE_PTHREAD_MUTEX_RECURSIVE)
   set(RECURSIVE_MUTEXES 1)
