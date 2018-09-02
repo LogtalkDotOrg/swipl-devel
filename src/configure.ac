@@ -1984,33 +1984,6 @@ if test "$ac_cv_func_mmap" = "yes"; then
 rm -f conftest.dummy
 fi
 
-
-dnl ****************************************************************
-dnl Are our signal handler is POSIX.1b?
-dnl ****************************************************************
-
-AC_CHECK_HEADERS(siginfo.h)
-
-AC_MSG_CHECKING("for SA_SIGINFO");
-AC_TRY_COMPILE(
-[ #include <signal.h>
-  #ifdef HAVE_SIGINFO_H
-  #include <siginfo.h>
-  #endif
-  extern void handler(int sig, siginfo_t *info, void *);
-],
-[ struct sigaction act;
-
-  act.sa_sigaction = handler;
-  act.sa_flags = SA_SIGINFO;
-
-  sigaction(SIGSEGV, (void *)0, &act);
-], AC_DEFINE(HAVE_SIGINFO, 1,
-	     [Define if signal handler is compliant to POSIX.1b])
-   AC_MSG_RESULT(yes),
-   AC_MSG_RESULT(no))
-
-
 dnl ================================================================
 dnl LNLIBS is the set of libraries you need for linking with the SWI-Prolog
 dnl kernel.  If this kernel is a shared object, this is typically empty.

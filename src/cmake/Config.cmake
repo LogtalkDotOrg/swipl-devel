@@ -23,7 +23,6 @@ check_include_file(ncurses/term.h HAVE_NCURSES_TERM_H)
 check_include_file(poll.h HAVE_POLL_H)
 check_include_file(pwd.h HAVE_PWD_H)
 check_include_file(shlobj.h HAVE_SHLOBJ_H)
-check_include_file(siginfo.h HAVE_SIGINFO_H)
 check_include_file(signal.h HAVE_SIGNAL_H)
 check_include_file(string.h HAVE_STRING_H)
 check_include_file(sys/dir.h HAVE_SYS_DIR_H)
@@ -260,5 +259,4 @@ endif()
 
 # HAVE_VISITED
 # HAVE_SIGNALS
-# HAVE_SIGINFO  (no longer used; may be deleted)
 # HAVE_RLIM_T   (no longer used; may be deleted)
