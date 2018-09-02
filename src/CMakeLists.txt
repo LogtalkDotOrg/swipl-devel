@@ -199,10 +199,14 @@ add_executable(mkvmi mkvmi.c)
 add_executable(defatom defatom.c)
 
 # Establish libraries
+if(CURSES_FOUND)
+  set(LIBSWIPL_LIBRARIES ${LIBSWIPL_LIBRARIES} ${CURSES_LIBRARIES})
+endif()
+if(GMP_FOUND)
+  set(LIBSWIPL_LIBRARIES ${LIBSWIPL_LIBRARIES} ${GMP_LIBRARIES})
+endif()
 set(LIBSWIPL_LIBRARIES
-    ${CURSES_LIBRARIES}
     ${ZLIB_LIBRARIES}
-    ${GMP_LIBRARIES}
     ${CMAKE_THREAD_LIBS_INIT})
 if(HAVE_LIBDL)
   set(LIBSWIPL_LIBRARIES ${LIBSWIPL_LIBRARIES} dl)
