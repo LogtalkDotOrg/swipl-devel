@@ -22,14 +22,22 @@ check_c_source_compiles(
     "volatile int i=0; int main() { return 0; }"
     HAVE_VOLATILE)
 check_c_source_compiles(
-    "int foo __attribute__((visibility (\"hidden\"))) = 1; int main() { return 0; }"
-    HAVE_VISIBILITY_ATTRIBUTE)
-check_c_source_compiles(
     "static inline foo() { return 0; } int main() { return foo(); }"
     HAVE_INLINE)
 check_c_source_compiles(
     "int main() { void *p = &&lbl; goto *p; lbl: return 0; }"
     O_LABEL_ADDRESSES)
+
+function(check_visibility)
+  set(CMAKE_REQUIRED_FLAGS ${CMAKE_REQUIRED_FLAGS} -Werror)
+  check_c_source_compiles(
+      "int foo __attribute__((visibility (\"hidden\"))) = 1; int main() { return 0; }"
+      HAVE_VISIBILITY_ATTRIBUTE)
+  if(HAVE_VISIBILITY_ATTRIBUTE)
+    set(HAVE_VISIBILITY_ATTRIBUTE 1 PARENT_SCOPE)
+  endif()
+endfunction()
+check_visibility()
 
 # Builtin functions that lead to conflicts
 
