@@ -201,7 +201,11 @@ add_custom_target(prolog_products ALL
 )
 
 configure_file(config.h.cmake config.h)
-file(WRITE "${CMAKE_CURRENT_BINARY_DIR}/../swipl.home" "${SWIPL_ROOT}\n")
+
+# Set swipl.home above binaries to a relative path to the root
+file(RELATIVE_PATH SWIPL_HOME_RELATIVE
+     ${CMAKE_CURRENT_BINARY_DIR}/.. ${SWIPL_ROOT})
+file(WRITE "${CMAKE_CURRENT_BINARY_DIR}/../swipl.home" "${SWIPL_HOME_RELATIVE}\n")
 
 # build helpers
 add_executable(mkvmi mkvmi.c)
