@@ -12,7 +12,8 @@ set(LIBSWIPL_LIBRARIES ${LIBSWIPL_LIBRARIES} winmm.lib)
 set(WIN32_DLLS
     libwinpthread-1.dll
     libgcc_s_seh-1.dll
-    zlib1.dll)
+    zlib1.dll
+    libgmp-10.dll)
 
 foreach(dll ${WIN32_DLLS})
   file(COPY ${MINGW_ROOT}/bin/${dll}
