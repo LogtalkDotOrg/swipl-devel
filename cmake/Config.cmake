@@ -277,6 +277,9 @@ endif()
 if(HAVE_READLINK)
   set(HAVE_SYMLINKS 1)
 endif()
+if(BUILD_SHARED_LIBS)
+  set(O_SHARED_KERNEL 1)
+endif()
 
 ################
 # Stuff we do not need to define is below such that findmacros.pl does
