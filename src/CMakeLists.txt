@@ -249,7 +249,9 @@ target_include_directories(libswipl BEFORE PRIVATE
 			   ${ZLIB_INCLUDE_DIRS})
 target_link_libraries(libswipl ${LIBSWIPL_LIBRARIES})
 
+if(WIN32)
 include(WindowsTargets)
+endif()
 
 # testing
 add_custom_target(check
