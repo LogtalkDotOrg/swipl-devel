@@ -245,6 +245,8 @@ target_include_directories(libswipl BEFORE PRIVATE
 			   ${ZLIB_INCLUDE_DIRS})
 target_link_libraries(libswipl ${LIBSWIPL_LIBRARIES})
 
+include(WindowsTargets)
+
 # testing
 add_custom_target(check
     COMMAND swipl -q -g test -t halt ${CMAKE_CURRENT_SOURCE_DIR}/test.pl
