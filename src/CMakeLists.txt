@@ -232,7 +232,8 @@ set_target_properties(libswipl PROPERTIES
 		      SOVERSION ${SWIPL_VERSION_MAJOR})
 target_include_directories(libswipl BEFORE PRIVATE
 			   ${CMAKE_CURRENT_BINARY_DIR}
-			   ${CMAKE_CURRENT_SOURCE_DIR})
+			   ${CMAKE_CURRENT_SOURCE_DIR}
+			   ${ZLIB_INCLUDE_DIRS})
 target_link_libraries(libswipl ${LIBSWIPL_LIBRARIES})
 
 # testing
