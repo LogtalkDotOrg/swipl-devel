@@ -8,4 +8,15 @@ endif()
 set(SRC_OS_SPECIFIC pl-nt.c pl-ntconsole.c pl-dde.c os/windows/uxnt.c)
 set(LIBSWIPL_LIBRARIES ${LIBSWIPL_LIBRARIES} winmm.lib)
 
+# Copy MinGW DLLs to the binary directory
+set(WIN32_DLLS
+    libwinpthread-1.dll
+    libgcc_s_seh-1.dll
+    zlib1.dll)
+
+foreach(dll ${WIN32_DLLS})
+  file(COPY ${MINGW_ROOT}/bin/${dll}
+       DESTINATION ${CMAKE_CURRENT_BINARY_DIR})
+endforeach()
+
 endif()
