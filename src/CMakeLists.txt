@@ -9,6 +9,7 @@ set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_CURRENT_SOURCE_DIR}/../cmake
 
 include(Version)
 include(Utils)
+include(Windows)
 
 include(CheckIncludeFile)
 include(CheckLibraryExists)
@@ -21,7 +22,9 @@ include(CheckStructHasMember)
 find_package(Threads)
 find_package(ZLIB)
 find_package(GMP)
+if(UNIX)
 find_package(Curses)
+endif(UNIX)
 
 include(Config)
 include(GCCBuiltins)
@@ -68,6 +71,7 @@ set(SRC_OS pl-buffer.c pl-ctype.c pl-file.c pl-files.c pl-glob.c pl-os.c
     pl-locale.c)
 prepend(SRC_OS os/ ${SRC_OS})
 
+
 set(SRC_TAI caltime_utc caltime_tai leapsecs_sub leapsecs_add
     caldate_fmjd caldate_mjd leapsecs_init leapsecs_read tai_pack
     tai_unpack)
@@ -92,7 +96,12 @@ set(SRC_CORE pl-atom.c pl-wam.c pl-arith.c pl-bag.c pl-error.c
 
 set(HDR_CORE pl-atom.ih pl-funct.ih)
 
-set(LIBSWIPL_SRC ${SRC_CORE} ${SRC_OS} ${SRC_TAI} ${SRC_MINIZIP})
+set(LIBSWIPL_SRC
+    ${SRC_CORE}
+    ${SRC_OS}
+    ${SRC_OS_SPECIFIC}
+    ${SRC_TAI}
+    ${SRC_MINIZIP})
 set(SWIPL_SRC pl-main.c)
 
 ################
