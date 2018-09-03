@@ -827,6 +827,11 @@ openResourceDB(int argc, char **argv)
 
   if ( (rc=zip_open_archive(tmp, flags)) )
     return rc;
+  if ( DirName(tmp, tmp) && strlen(tmp)+strlen("swipl.prc")+1 < MAXPATHLEN )
+  { strcat(tmp, "swipl.prc");
+    if ( (rc=zip_open_archive(tmp, flags)) )
+      return rc;
+  }
 
   if ( systemDefaults.home )
   { if ( strlen(systemDefaults.home)+1+strlen(BOOTFILE) < MAXPATHLEN )
