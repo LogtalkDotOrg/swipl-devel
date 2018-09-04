@@ -25,6 +25,11 @@ endif()
 include_directories(BEFORE ${SWIPL_ROOT}/src ${SWIPL_ROOT}/src/os)
 include_directories(BEFORE ${CMAKE_CURRENT_BINARY_DIR})
 
-set(SWIPL_LIBRARIES "")
+if(CMAKE_EXECUTABLE_FORMAT STREQUAL "ELF")
+  set(SWIPL_LIBRARIES "")
+else()
+  set(SWIPL_LIBRARIES libswipl)
+endif()
+
 set(SWIPL_INSTALL_MODULES ${SWIPL_INSTALL_PREFIX}/lib/${SWIPL_ARCH})
 set(SWIPL_INSTALL_LIBRARY ${SWIPL_INSTALL_PREFIX}/library)
