@@ -222,6 +222,7 @@ if(CURSES_FOUND)
 endif()
 if(GMP_FOUND)
   set(LIBSWIPL_LIBRARIES ${LIBSWIPL_LIBRARIES} ${GMP_LIBRARIES})
+  set(LIBSWIPL_INCLUDES ${LIBSWIPL_INCLUDES} ${GMP_INCLUDE_DIRS})
 endif()
 set(LIBSWIPL_LIBRARIES
     ${LIBSWIPL_LIBRARIES}
@@ -251,7 +252,8 @@ set_target_properties(libswipl PROPERTIES
 target_include_directories(libswipl BEFORE PRIVATE
 			   ${CMAKE_CURRENT_BINARY_DIR}
 			   ${CMAKE_CURRENT_SOURCE_DIR}
-			   ${ZLIB_INCLUDE_DIRS})
+			   ${ZLIB_INCLUDE_DIRS}
+			   ${LIBSWIPL_INCLUDES})
 target_link_libraries(libswipl ${LIBSWIPL_LIBRARIES})
 
 if(WIN32)
