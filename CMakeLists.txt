@@ -1,6 +1,9 @@
 cmake_minimum_required(VERSION 3.0)
 project(SWI-Prolog)
 
+set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
+include(Version)
+
 # Default location to install SWI-Prolog (for now)
 if(IS_DIRECTORY "$ENV{SWIPL_INSTALL_PREFIX}")
   set(CMAKE_INSTALL_PREFIX $ENV{SWIPL_INSTALL_PREFIX})
@@ -29,3 +32,5 @@ add_subdirectory(src)
 foreach(package ${SWIPL_PACKAGE_LIST})
   add_subdirectory(packages/${package})
 endforeach(package)
+
+include(Pack)
