@@ -221,6 +221,14 @@ check_function_exists(sched_setaffinity HAVE_SCHED_SETAFFINITY)
 check_function_exists(sema_init HAVE_SEMA_INIT)
 check_function_exists(sem_init HAVE_SEM_INIT)
 include(TestRecursiveMutex)
+if(HAVE_PTHREAD_SETNAME_NP)
+check_c_source_compiles(
+    "#include <pthread.h>\nint main() { pthread_setname_np(0, \"myname\"); return 0;}"
+    HAVE_PTHREAD_SETNAME_NP_WITH_TID)
+if(NOT HAVE_PTHREAD_SETNAME_NP_WITH_TID)
+  set(HAVE_PTHREAD_SETNAME_NP_WITHOUT_TID 1)
+endif()
+endif(HAVE_PTHREAD_SETNAME_NP)
 endif(CMAKE_USE_PTHREADS_INIT)
 # Windows
 check_function_exists(WSAPoll HAVE_WSAPOLL)
