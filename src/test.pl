@@ -39,7 +39,6 @@
 %:- set_prolog_flag(trace_gc, true).
 :- prolog_load_context(directory, Dir),
    atom_concat(Dir, '/../packages/plunit', PlUnitDir),
-   writeln(PlUnitDir),
    asserta(user:file_search_path(library, PlUnitDir)).
 :- [library(plunit)].
 :- set_test_options([load(always), silent(true), sto(true), cleanup(true)]).
