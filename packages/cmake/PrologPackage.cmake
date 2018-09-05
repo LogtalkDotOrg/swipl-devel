@@ -25,6 +25,7 @@ if(NOT SWIPL_ARCH)
   string(TOLOWER ${CMAKE_HOST_SYSTEM_PROCESSOR}-${CMAKE_HOST_SYSTEM_NAME}
 	 SWIPL_ARCH)
 endif()
+string(REGEX REPLACE "^.*-" "" SWIPL_PKG ${PROJECT_NAME})
 
 include_directories(BEFORE ${SWIPL_ROOT}/src ${SWIPL_ROOT}/src/os)
 include_directories(BEFORE ${CMAKE_CURRENT_BINARY_DIR})
@@ -62,15 +63,27 @@ function(swipl_plugin name)
     endif()
   endforeach()
 
-  add_library(${target} MODULE ${c_sources})
-  set_target_properties(${target} PROPERTIES OUTPUT_NAME ${name} PREFIX "")
-  target_link_libraries(${target} ${c_libs} ${SWIPL_LIBRARIES})
+  if(c_sources)
+    add_library(${target} MODULE ${c_sources})
+    set_target_properties(${target} PROPERTIES OUTPUT_NAME ${name} PREFIX "")
+    target_link_libraries(${target} ${c_libs} ${SWIPL_LIBRARIES})
 
-  install(TARGETS ${target}
-	  LIBRARY DESTINATION ${SWIPL_INSTALL_MODULES})
+    install(TARGETS ${target}
+	    LIBRARY DESTINATION ${SWIPL_INSTALL_MODULES})
+  endif()
+
   install(FILES ${pl_libs}
 	  DESTINATION ${SWIPL_INSTALL_LIBRARY})
 endfunction(swipl_plugin)
+
+# swipl_examples(file ...)
+#
+# Install the examples
+
+function(swipl_examples)
+  install(FILES ${ARGN}
+	  DESTINATION ${SWIPL_INSTALL_PREFIX}/doc/packages/examples/${SWIPL_PKG})
+endfunction()
 
 # test_lib(name)
 #

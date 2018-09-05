@@ -24,6 +24,7 @@ endif()
 set(SWIPL_PACKAGE_LIST
     clib
     libedit
+    plunit
 )
 
 enable_testing()
