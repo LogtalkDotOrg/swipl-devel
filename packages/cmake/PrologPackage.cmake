@@ -70,4 +70,28 @@ function(swipl_plugin name)
 	  LIBRARY DESTINATION ${SWIPL_INSTALL_MODULES})
   install(FILES ${pl_libs}
 	  DESTINATION ${SWIPL_INSTALL_LIBRARY})
-endfunction()
+endfunction(swipl_plugin)
+
+# test_lib(name)
+#
+# Run test_${name} in test_${name}.pl
+
+function(test_lib name)
+  set(test_source "test_${name}.pl")
+  set(test_goal   "test_${name}")
+
+  add_test(NAME ${name}
+	   COMMAND swipl -p foreign=${CMAKE_CURRENT_BINARY_DIR}
+			 -f none -s ${test_source}
+			 -g "${test_goal}"
+			 -t halt
+	   WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR})
+endfunction(test_lib)
+
+# test_libs(name ...)
+
+function(test_libs)
+  foreach(lib ${ARGN})
+    test_lib(${lib})
+  endforeach()
+endfunction(test_libs)

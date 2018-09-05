@@ -26,6 +26,8 @@ set(SWIPL_PACKAGE_LIST
     libedit
 )
 
+enable_testing()
+
 # Add the core Prolog system
 add_subdirectory(src)
 
