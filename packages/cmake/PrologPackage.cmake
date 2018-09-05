@@ -37,3 +37,37 @@ endif()
 
 set(SWIPL_INSTALL_MODULES ${SWIPL_INSTALL_PREFIX}/lib/${SWIPL_ARCH})
 set(SWIPL_INSTALL_LIBRARY ${SWIPL_INSTALL_PREFIX}/library)
+
+# swipl_foreign_module(name
+#		       [C_SOURCES file ...]
+#		       [C_LIBS lib ...]
+#		       [PL_LIBS file ...])
+
+function(swipl_foreign_module name)
+  set(target "module_${name}")
+  set(c_sources)
+  set(c_libs)
+  set(pl_libs)
+  set(mode)
+
+  foreach(arg ${ARGN})
+    if(arg STREQUAL "C_SOURCES")
+      set(mode c_sources)
+    elseif(arg STREQUAL "C_LIBS")
+      set(mode c_libs)
+    elseif(arg STREQUAL "PL_LIBS")
+      set(mode pl_libs)
+    else()
+      set(${mode} ${${mode}} ${arg})
+    endif()
+  endforeach()
+
+  add_library(${target} MODULE ${c_sources})
+  set_target_properties(${target} PROPERTIES OUTPUT_NAME ${name} PREFIX "")
+  target_link_libraries(${target} ${c_libs} ${SWIPL_LIBRARIES})
+
+  install(TARGETS ${target}
+	  LIBRARY DESTINATION ${SWIPL_INSTALL_MODULES})
+  install(FILES ${pl_libs}
+	  DESTINATION ${SWIPL_INSTALL_LIBRARY})
+endfunction()
