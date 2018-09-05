@@ -27,5 +27,5 @@ FUNCTION(ILINK from to)
    get_filename_component(LNTNAME ${from} NAME)
    file(RELATIVE_PATH LNLNK ${LNTDIR} ${from})
    install(CODE "EXECUTE_PROCESS(COMMAND ln -sf ${LNLNK} ./${LNTNAME}
-		                 WORKING_DIRECTORY ${LNTDIR})")
+		                 WORKING_DIRECTORY \$ENV{DESTDIR}${LNTDIR})")
 ENDFUNCTION(ILINK)

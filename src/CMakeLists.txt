@@ -210,8 +210,12 @@ configure_file(config.h.cmake config.h)
 
 # Set swipl.home above binaries to a relative path to the root
 file(RELATIVE_PATH SWIPL_HOME_RELATIVE
-     ${CMAKE_CURRENT_BINARY_DIR}/.. ${SWIPL_ROOT})
+     ${CMAKE_CURRENT_BINARY_DIR}/.. ${SWIPL_ROOT}/X)
+get_filename_component(SWIPL_HOME_RELATIVE ${SWIPL_HOME_RELATIVE} DIRECTORY)
 file(WRITE "${CMAKE_CURRENT_BINARY_DIR}/../swipl.home" "${SWIPL_HOME_RELATIVE}\n")
+# Final swipl.home for installed system
+file(WRITE "${CMAKE_CURRENT_BINARY_DIR}/dot.txt" ".\n")
+file(WRITE "${CMAKE_CURRENT_BINARY_DIR}/dotdot.txt" "..\n")
 
 # build helpers
 add_executable(mkvmi mkvmi.c)
@@ -292,8 +296,12 @@ install(FILES
 	${CMAKE_CURRENT_SOURCE_DIR}/SWI-Prolog.h
 	${CMAKE_CURRENT_SOURCE_DIR}/os/SWI-Stream.h
 	DESTINATION ${SWIPL_INSTALL_INCLUDE})
-install(CODE "file(WRITE ${SWIPL_INSTALL_PREFIX}/bin/swipl.home \"..\n\")")
-install(CODE "file(WRITE ${SWIPL_INSTALL_PREFIX}/swipl.home \".\n\")")
+install(FILES ${CMAKE_CURRENT_BINARY_DIR}/dot.txt
+	DESTINATION ${SWIPL_INSTALL_PREFIX}
+	RENAME "swipl.home")
+install(FILES ${CMAKE_CURRENT_BINARY_DIR}/dotdot.txt
+	DESTINATION ${SWIPL_INSTALL_PREFIX}/bin
+	RENAME "swipl.home")
 
 if(WIN32)
 install(TARGETS swipl-win
