@@ -270,6 +270,7 @@ add_custom_target(check
     COMMAND swipl -q -g test -t halt ${CMAKE_CURRENT_SOURCE_DIR}/test.pl
 )
 # For ctest
+# FIXME: split the core tests such that ctest shows progress.
 add_test(NAME core
 	 COMMAND swipl -q -g test -t halt ${CMAKE_CURRENT_SOURCE_DIR}/test.pl)
 
