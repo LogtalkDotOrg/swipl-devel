@@ -38,13 +38,13 @@ endif()
 set(SWIPL_INSTALL_MODULES ${SWIPL_INSTALL_PREFIX}/lib/${SWIPL_ARCH})
 set(SWIPL_INSTALL_LIBRARY ${SWIPL_INSTALL_PREFIX}/library)
 
-# swipl_foreign_module(name
-#		       [C_SOURCES file ...]
-#		       [C_LIBS lib ...]
-#		       [PL_LIBS file ...])
+# swipl_plugin(name
+#	       [C_SOURCES file ...]
+#	       [C_LIBS lib ...]
+#	       [PL_LIBS file ...])
 
-function(swipl_foreign_module name)
-  set(target "module_${name}")
+function(swipl_plugin name)
+  set(target "plugin_${name}")
   set(c_sources)
   set(c_libs)
   set(pl_libs)
