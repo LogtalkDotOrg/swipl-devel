@@ -265,10 +265,13 @@ if(WIN32)
 include(WindowsTargets)
 endif()
 
-# testing
+# testing (traditional)
 add_custom_target(check
     COMMAND swipl -q -g test -t halt ${CMAKE_CURRENT_SOURCE_DIR}/test.pl
 )
+# For ctest
+add_test(NAME core
+	 COMMAND swipl -q -g test -t halt ${CMAKE_CURRENT_SOURCE_DIR}/test.pl)
 
 # Populate parms.h, making the compilation environment known to Prolog
 include(Params)
