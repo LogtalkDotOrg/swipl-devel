@@ -86,7 +86,7 @@ set(CMAKE_EXTRA_INCLUDE_FILES ${CMAKE_EXTRA_INCLUDE_FILES} math.h)
 check_type_size("int" SIZEOF_INT)
 check_type_size("long" SIZEOF_LONG)
 check_type_size("void *" SIZEOF_VOIDP)
-check_type_size("long long int" SIZEOF_LONG_LONG)
+check_type_size("long long" SIZEOF_LONG_LONG)
 check_type_size("wchar_t" SIZEOF_WCHAR_T)
 check_type_size("mp_bitcnt_t" SIZEOF_MP_BITCNT_T)
 

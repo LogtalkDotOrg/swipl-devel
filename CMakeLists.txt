@@ -22,6 +22,7 @@ else()
 endif()
 
 set(SWIPL_PACKAGE_LIST
+    clib
     libedit
 )
 

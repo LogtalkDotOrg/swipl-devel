@@ -7,6 +7,10 @@ set(CMAKE_MODULE_PATH
 # CMake modules we always need
 include(CheckIncludeFile)
 include(CheckFunctionExists)
+include(CheckSymbolExists)
+
+# Arity is of size_t.  This should now be the case for all packages
+set(PL_ARITY_AS_SIZE 1)
 
 if(NOT SWIPL_ROOT)
   get_filename_component(SWIPL_ROOT ../.. ABSOLUTE)
