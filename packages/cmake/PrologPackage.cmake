@@ -42,6 +42,7 @@ set(SWIPL_INSTALL_LIBRARY ${SWIPL_INSTALL_PREFIX}/library)
 # swipl_plugin(name
 #	       [C_SOURCES file ...]
 #	       [C_LIBS lib ...]
+#	       [PL_LIB_SUBDIR subdir]
 #	       [PL_LIBS file ...])
 
 function(swipl_plugin name)
@@ -49,6 +50,8 @@ function(swipl_plugin name)
   set(c_sources)
   set(c_libs)
   set(pl_libs)
+  set(pl_lib_subdir)
+
   set(mode)
 
   foreach(arg ${ARGN})
@@ -58,6 +61,8 @@ function(swipl_plugin name)
       set(mode c_libs)
     elseif(arg STREQUAL "PL_LIBS")
       set(mode pl_libs)
+    elseif(arg STREQUAL "PL_LIB_SUBDIR")
+      set(mode pl_lib_subdir)
     else()
       set(${mode} ${${mode}} ${arg})
     endif()
@@ -73,7 +78,7 @@ function(swipl_plugin name)
   endif()
 
   install(FILES ${pl_libs}
-	  DESTINATION ${SWIPL_INSTALL_LIBRARY})
+	  DESTINATION ${SWIPL_INSTALL_LIBRARY}/${pl_lib_subdir})
 endfunction(swipl_plugin)
 
 # swipl_examples(file ...)

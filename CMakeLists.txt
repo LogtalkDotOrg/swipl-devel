@@ -25,6 +25,7 @@ set(SWIPL_PACKAGE_LIST
     clib
     libedit
     plunit
+    http
 )
 
 enable_testing()
