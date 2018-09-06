@@ -90,26 +90,68 @@ function(swipl_examples)
 	  DESTINATION ${SWIPL_INSTALL_PREFIX}/doc/packages/examples/${SWIPL_PKG})
 endfunction()
 
-# test_lib(name)
+# test_lib(name
+#	   [PACKAGES ...]
+#	   [PARENT_LIB])
 #
 # Run test_${name} in test_${name}.pl
 
 function(test_lib name)
   set(test_source "test_${name}.pl")
   set(test_goal   "test_${name}")
+  set(mode)
+  set(packages)
+  set(pforeign ${CMAKE_CURRENT_BINARY_DIR})
+  set(plibrary ".")
+  set(sep ":")
 
-  add_test(NAME ${name}
-	   COMMAND swipl -p foreign=${CMAKE_CURRENT_BINARY_DIR}
+  foreach(arg ${ARGN})
+    if(arg STREQUAL "PACKAGES")
+      set(mode "packages")
+    elseif(arg STREQUAL "PARENT_LIB")
+      set(plibrary "${plibrary}${sep}${..}")
+    else()
+      set(${mode} ${${mode}} ${arg})
+    endif()
+  endforeach()
+
+  foreach(pkg ${packages})
+    get_filename_component(src ${CMAKE_CURRENT_SOURCE_DIR}/../${pkg} ABSOLUTE)
+    get_filename_component(bin ${CMAKE_CURRENT_BINARY_DIR}/../${pkg} ABSOLUTE)
+    set(plibrary "${plibrary}${sep}${src}")
+    set(pforeign "${pforeign}${sep}${bin}")
+  endforeach()
+
+  add_test(NAME "${SWIPL_PKG}:${name}"
+	   COMMAND swipl -p foreign=${pforeign}
+			 -p library=${plibrary}
 			 -f none -s ${test_source}
 			 -g "${test_goal}"
 			 -t halt
 	   WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR})
 endfunction(test_lib)
 
-# test_libs(name ...)
+# test_libs(name ...
+#	    [PACKAGES package ...]
+#	    [PARENT_LIB])
 
 function(test_libs)
-  foreach(lib ${ARGN})
-    test_lib(${lib})
+  set(mode tests)
+  set(tests)
+  set(packages)
+  set(extra)
+
+  foreach(arg ${ARGN})
+    if(arg STREQUAL "PACKAGES")
+      set(mode "packages")
+    elseif(arg STREQUAL "PARENT_LIB")
+      set(extra PARENT_LIB)
+    else()
+      set(${mode} ${${mode}} ${arg})
+    endif()
+  endforeach()
+
+  foreach(test ${tests})
+    test_lib(${test} PACKAGES ${packages} ${extra})
   endforeach()
 endfunction(test_libs)
