@@ -23,9 +23,11 @@ endif()
 
 set(SWIPL_PACKAGE_LIST
     clib
+    tipc
     zlib
     archive
     libedit
+    PDT
     plunit
     sgml
     http
