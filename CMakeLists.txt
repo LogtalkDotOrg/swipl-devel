@@ -24,6 +24,7 @@ endif()
 set(SWIPL_PACKAGE_LIST
     clib
     zlib
+    archive
     libedit
     plunit
     sgml
@@ -31,6 +32,7 @@ set(SWIPL_PACKAGE_LIST
     ssl
     RDF
     semweb
+    nlp
 )
 
 enable_testing()
