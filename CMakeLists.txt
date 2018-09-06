@@ -29,6 +29,8 @@ set(SWIPL_PACKAGE_LIST
     sgml
     http
     ssl
+    RDF
+    semweb
 )
 
 enable_testing()

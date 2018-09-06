@@ -1,8 +1,11 @@
 # Include in all Prolog packages
 
+# Get cmake files from this package, the package infrastructure and
+# SWI-Prolog overall
 set(CMAKE_MODULE_PATH
     "${CMAKE_CURRENT_SOURCE_DIR}/cmake"
-    "${CMAKE_CURRENT_SOURCE_DIR}/../cmake")
+    "${CMAKE_CURRENT_SOURCE_DIR}/../cmake"
+    "${CMAKE_CURRENT_SOURCE_DIR}/../../cmake")
 
 # CMake modules we always need
 include(CheckIncludeFile)
@@ -109,7 +112,7 @@ function(test_lib name)
     if(arg STREQUAL "PACKAGES")
       set(mode "packages")
     elseif(arg STREQUAL "PARENT_LIB")
-      set(plibrary "${plibrary}${sep}${..}")
+      set(plibrary "${plibrary}${sep}..")
     else()
       set(${mode} ${${mode}} ${arg})
     endif()
@@ -155,3 +158,15 @@ function(test_libs)
     test_lib(${test} PACKAGES ${packages} ${extra})
   endforeach()
 endfunction(test_libs)
+
+# has_package(var name)
+# Set var to ON if the package name is included in the targets
+
+function(has_package name var)
+  list(FIND SWIPL_PACKAGE_LIST ${name} index)
+  if ( ${index} GREATER -1 )
+    set(var ON)
+  else()
+    set(var OFF)
+  endif()
+endfunction()
