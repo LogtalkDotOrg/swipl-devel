@@ -23,10 +23,12 @@ endif()
 
 set(SWIPL_PACKAGE_LIST
     clib
+    zlib
     libedit
     plunit
     sgml
     http
+    ssl
 )
 
 enable_testing()
