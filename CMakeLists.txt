@@ -30,9 +30,12 @@ set(SWIPL_PACKAGE_LIST
     sgml
     http
     ssl
+    pcre
     RDF
     semweb
     table
+    bdb
+    odbc
     nlp
     utf8proc
     yaml
