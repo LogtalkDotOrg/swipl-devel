@@ -28,6 +28,10 @@ if(NOT SWIPL_ARCH)
   string(TOLOWER ${CMAKE_HOST_SYSTEM_PROCESSOR}-${CMAKE_HOST_SYSTEM_NAME}
 	 SWIPL_ARCH)
 endif()
+if(NOT DEFINED O_PLMT)
+  set(O_PLMT 1)
+  set(_REENTRANT 1)
+endif()
 string(REGEX REPLACE "^.*-" "" SWIPL_PKG ${PROJECT_NAME})
 
 include_directories(BEFORE ${SWIPL_ROOT}/src ${SWIPL_ROOT}/src/os)
