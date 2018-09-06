@@ -27,6 +27,7 @@ set(SWIPL_PACKAGE_LIST
     zlib
     archive
     libedit
+    readline
     PDT
     plunit
     sgml
