@@ -32,7 +32,9 @@ set(SWIPL_PACKAGE_LIST
     ssl
     RDF
     semweb
+    table
     nlp
+    utf8proc
     yaml
 )
 
