@@ -33,6 +33,7 @@ set(SWIPL_PACKAGE_LIST
     RDF
     semweb
     nlp
+    yaml
 )
 
 enable_testing()
