@@ -42,6 +42,7 @@ set(SWIPL_PACKAGE_LIST
     nlp
     utf8proc
     yaml
+    xpce
 )
 
 enable_testing()

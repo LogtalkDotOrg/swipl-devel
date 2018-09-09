@@ -40,3 +40,11 @@ function(AC_CHECK_FUNCS)
   endforeach()
 endfunction()
 
+# Prolog parts
+
+function(library_index dir)
+  add_custom_command(
+      OUTPUT ${dir}/INDEX.pl
+      COMMAND swipl -f none -g "\"make_library_index('${dir}')\"" -t halt
+      DEPENDS ${dir})
+endfunction()
