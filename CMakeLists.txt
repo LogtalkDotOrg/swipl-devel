@@ -34,8 +34,11 @@ set(SWIPL_PACKAGE_LIST
     libedit
     nlp
     odbc
+    paxos
     pcre
     PDT
+    pengines
+    pldoc
     plunit
     RDF
     readline
