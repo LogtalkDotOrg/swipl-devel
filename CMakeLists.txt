@@ -43,6 +43,7 @@ set(SWIPL_PACKAGE_LIST
     utf8proc
     yaml
     xpce
+    chr
 )
 
 enable_testing()
