@@ -31,6 +31,7 @@ set(SWIPL_PACKAGE_LIST
     cql
     http
     inclpr
+    jpl
     libedit
     nlp
     odbc
