@@ -22,28 +22,32 @@ else()
 endif()
 
 set(SWIPL_PACKAGE_LIST
-    clib
-    tipc
-    zlib
     archive
+    bdb
+    chr
+    clib
+    clpqr
+    cpp
+    cql
+    http
+    inclpr
     libedit
-    readline
+    nlp
+    odbc
+    pcre
     PDT
     plunit
-    sgml
-    http
-    ssl
-    pcre
     RDF
+    readline
     semweb
+    sgml
+    ssl
     table
-    bdb
-    odbc
-    nlp
+    tipc
     utf8proc
-    yaml
     xpce
-    chr
+    yaml
+    zlib
 )
 
 enable_testing()
