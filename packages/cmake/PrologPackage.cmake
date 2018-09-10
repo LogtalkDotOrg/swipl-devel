@@ -45,6 +45,7 @@ endif()
 
 set(SWIPL_INSTALL_MODULES ${SWIPL_INSTALL_PREFIX}/lib/${SWIPL_ARCH})
 set(SWIPL_INSTALL_LIBRARY ${SWIPL_INSTALL_PREFIX}/library)
+set(SWIPL_INSTALL_INCLUDE ${SWIPL_INSTALL_PREFIX}/include)
 
 # swipl_plugin(name
 #	       [C_SOURCES file ...]
