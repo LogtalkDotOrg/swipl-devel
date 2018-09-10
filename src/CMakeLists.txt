@@ -111,16 +111,25 @@ set(LIBSWIPL_SRC
 set(SWIPL_SRC pl-main.c)
 
 ################
-# Prolog files
+# Prolog data files
 ################
 
-set(SWIPL_BOOT_FILES syspred.pl toplevel.pl license.pl bags.pl apply.pl
+set(SWIPL_DATA_INDEXED_DIRS
+    library library/clp library/dcg)
+set(SWIPL_DATA_DIRS
+    boot
+    ${SWIPL_DATA_INDEXED_DIRS}
+    library/dialect library/dialect/swi library/dialect/eclipse
+    library/dialect/hprolog library/dialect/sicstus library/dialect/iso
+    library/dialect/yap)
+
+set(SWIPL_DATA_boot syspred.pl toplevel.pl license.pl bags.pl apply.pl
     expand.pl dcg.pl history.pl attvar.pl packs.pl dwim.pl rc.pl predopts.pl
     parms.pl autoload.pl qlf.pl topvars.pl messages.pl load.pl dicts.pl
     engines.pl iri.pl tabling.pl)
-prepend(SWIPL_BOOT_FILES ${SWIPL_BOOT_ROOT} ${SWIPL_BOOT_FILES})
+prepend(SWIPL_BOOT_FILES ${SWIPL_BOOT_ROOT} ${SWIPL_DATA_boot})
 
-set(PL_LIB helpidx.pl help.pl explain.pl sort.pl
+set(SWIPL_DATA_library helpidx.pl help.pl explain.pl sort.pl
     qsave.pl shlib.pl statistics.pl system.pl error.pl
     backcomp.pl gensym.pl listing.pl debug.pl vm.pl
     quintus.pl edinburgh.pl ctypes.pl files.pl modules.pl
@@ -144,17 +153,31 @@ set(PL_LIB helpidx.pl help.pl explain.pl sort.pl
     solution_sequences.pl iostream.pl dicts.pl yall.pl tabling.pl
     lazy_lists.pl prolog_jiti.pl zip.pl obfuscate.pl)
 
-set(PL_LIB_CLP bounds.pl clp_events.pl clp_distinct.pl simplex.pl
-    clpfd.pl clpb.pl)
-prepend(PL_LIB_CLP clp/ ${PL_LIB_CLP})
+set(SWIPL_DATA_library_clp bounds.pl clp_events.pl clp_distinct.pl
+    simplex.pl clpfd.pl clpb.pl)
 
-set(PL_LIB_DCG basics.pl)
-prepend(PL_LIB_DCG dcg/ ${PL_LIB_DCG})
+set(SWIPL_DATA_library_dcg basics.pl)
 
-prepend(PL_LIB_FILES     ${SWIPL_LIBRARY_ROOT} ${PL_LIB})
-prepend(PL_LIB_FILES_CLP ${SWIPL_LIBRARY_ROOT} ${PL_LIB_CLP})
-prepend(PL_LIB_FILES_DCG ${SWIPL_LIBRARY_ROOT} ${PL_LIB_DCG})
-set(PL_LIB_FILES_ALL ${PL_LIB_FILES} ${PL_LIB_FILES_CLP} ${PL_LIB_FILES_DCG})
+set(SWIPL_DATA_library_dialect bim.pl commons.pl hprolog.pl ifprolog.pl
+    sicstus.pl yap.pl)
+
+set(SWIPL_DATA_library_dialect_swi syspred_options.pl)
+set(SWIPL_DATA_library_dialect_eclipse test_util_iso.pl)
+set(SWIPL_DATA_library_dialect_hprolog format.pl)
+set(SWIPL_DATA_library_dialect_sicstus arrays.pl block.pl lists.pl
+    README.TXT sockets.pl swipl-lfr.pl system.pl terms.pl timeout.pl)
+set(SWIPL_DATA_library_dialect_iso iso_predicates.pl)
+set(SWIPL_DATA_library_dialect_yap README.TXT)
+
+# ${PL_LIB_FILES_ALL} holds all files from the library that are indexed
+# ${PL_LIB_INDEX} holds the index file
+
+set(PL_LIB_FILES_ALL)
+foreach(d ${SWIPL_DATA_INDEXED_DIRS})
+    string(REGEX REPLACE "/" "_" filevar ${d})
+    prepend(files ${SWIPL_ROOT}/${d} ${SWIPL_DATA_${filevar}})
+    set(PL_LIB_FILES_ALL ${PL_LIB_FILES_ALL} ${files})
+endforeach()
 set(PL_LIB_INDEX ${SWIPL_LIBRARY_ROOT}/INDEX.pl)
 
 ################
@@ -291,11 +314,14 @@ install(FILES ${CMAKE_CURRENT_BINARY_DIR}/swipl.prc
 	RENAME ${SWIPL_BOOT_FILE}
 )
 install(CODE "MESSAGE(\"Installing the library.\")")
-install(FILES ${PL_LIB_FILES}     DESTINATION ${SWIPL_INSTALL_LIBRARY})
-install(FILES ${PL_LIB_FILES_CLP} DESTINATION ${SWIPL_INSTALL_LIBRARY}/clp)
-install(FILES ${PL_LIB_FILES_DCG} DESTINATION ${SWIPL_INSTALL_LIBRARY}/dcg)
-install(FILES ${PL_LIB_INDEX}     DESTINATION ${SWIPL_INSTALL_LIBRARY})
-install(FILES ${SWIPL_BOOT_FILES} DESTINATION ${SWIPL_INSTALL_BOOT})
+foreach(d ${SWIPL_DATA_DIRS})
+    string(REGEX REPLACE "/" "_" filevar ${d})
+    prepend(files ${SWIPL_ROOT}/${d} ${SWIPL_DATA_${filevar}})
+    install(FILES ${files}
+	    DESTINATION ${SWIPL_INSTALL_PREFIX}/${d})
+endforeach()
+install(FILES ${PL_LIB_INDEX}
+	DESTINATION ${SWIPL_INSTALL_PREFIX}/library)
 install(FILES
 	${CMAKE_CURRENT_SOURCE_DIR}/SWI-Prolog.h
 	${CMAKE_CURRENT_SOURCE_DIR}/os/SWI-Stream.h
