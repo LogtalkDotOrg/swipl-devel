@@ -89,13 +89,25 @@ function(swipl_plugin name)
 	  DESTINATION ${SWIPL_INSTALL_LIBRARY}/${pl_lib_subdir})
 endfunction(swipl_plugin)
 
-# swipl_examples(file ...)
+# swipl_examples(file ... [SUBDIR dir])
 #
 # Install the examples
 
 function(swipl_examples)
-  install(FILES ${ARGN}
-	  DESTINATION ${SWIPL_INSTALL_PREFIX}/doc/packages/examples/${SWIPL_PKG})
+  set(mode files)
+  set(files)
+  set(subdir)
+
+  foreach(arg ${ARGN})
+    if(arg STREQUAL "SUBDIR")
+      set(mode subdir)
+    else()
+      set(${mode} ${${mode}} ${arg})
+    endif()
+  endforeach()
+
+  install(FILES ${files}
+	  DESTINATION ${SWIPL_INSTALL_PREFIX}/doc/packages/examples/${SWIPL_PKG}/${subdir})
 endfunction()
 
 # test_lib(name
