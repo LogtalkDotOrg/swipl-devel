@@ -14,3 +14,10 @@ mkdir win64
 cd win64
 cmake -DCMAKE_TOOLCHAIN_FILE=../cmake/cross/linux_win64.cmake ..
 ```
+
+# Issues
+
+  - Build documention
+  - Test Darwin and MinGW cross compilation
+  - Create installers
+  - chr compilaton depends on `swipl`, but *also* on the boot file.
