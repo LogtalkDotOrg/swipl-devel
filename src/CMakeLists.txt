@@ -121,9 +121,10 @@ set(SWIPL_DATA_DIRS
     ${SWIPL_DATA_INDEXED_DIRS}
     library/dialect library/dialect/swi library/dialect/eclipse
     library/dialect/hprolog library/dialect/sicstus library/dialect/iso
-    library/dialect/yap)
+    library/dialect/yap
+    demo)
 
-set(SWIPL_DATA_boot syspred.pl toplevel.pl license.pl bags.pl apply.pl
+set(SWIPL_DATA_boot init.pl syspred.pl toplevel.pl license.pl bags.pl apply.pl
     expand.pl dcg.pl history.pl attvar.pl packs.pl dwim.pl rc.pl predopts.pl
     parms.pl autoload.pl qlf.pl topvars.pl messages.pl load.pl dicts.pl
     engines.pl iri.pl tabling.pl)
@@ -168,6 +169,8 @@ set(SWIPL_DATA_library_dialect_sicstus arrays.pl block.pl lists.pl
     README.TXT sockets.pl swipl-lfr.pl system.pl terms.pl timeout.pl)
 set(SWIPL_DATA_library_dialect_iso iso_predicates.pl)
 set(SWIPL_DATA_library_dialect_yap README.TXT)
+
+set(SWIPL_DATA_demo likes.pl README)
 
 # ${PL_LIB_FILES_ALL} holds all files from the library that are indexed
 # ${PL_LIB_INDEX} holds the index file
@@ -284,6 +287,11 @@ target_include_directories(libswipl BEFORE PRIVATE
 			   ${LIBSWIPL_INCLUDES})
 target_link_libraries(libswipl ${LIBSWIPL_LIBRARIES})
 
+add_executable(swipl-ld swipl-ld.c)
+target_include_directories(swipl-ld BEFORE PRIVATE
+			   ${CMAKE_CURRENT_BINARY_DIR}
+			   ${CMAKE_CURRENT_SOURCE_DIR})
+
 if(WIN32)
 include(WindowsTargets)
 endif()
@@ -305,7 +313,7 @@ configure_file(parms.h.cmake parms.h)
 # Installation
 ################
 
-install(TARGETS swipl libswipl
+install(TARGETS swipl libswipl swipl-ld
 	RUNTIME DESTINATION ${SWIPL_INSTALL_ARCH_EXE}
         LIBRARY DESTINATION ${SWIPL_INSTALL_ARCH_LIB}
 )
