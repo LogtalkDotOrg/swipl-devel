@@ -99,9 +99,9 @@ main(int argc, char **argv)
 	int arity;
 
 	if ( sscanf(buf, "F%s%d", id, &arity) == 2 )
-	{ char name[256];
+	{ char name[300];
 
-	  sprintf(name, "%s%d", id, arity);
+	  snprintf(name, sizeof(name)-1, "%s%d", id, arity);
 	  fprintf(fih, "#define FUNCTOR_%-12s MK_FUNCTOR(%d, %d)\n", name, functor++, arity);
 	  fprintf(fic, "FUNCTOR(ATOM_%s, %d),\n", id, arity);
 	} else
