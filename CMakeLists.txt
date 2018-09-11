@@ -41,6 +41,7 @@ set(SWIPL_PACKAGE_LIST
     pengines
     pldoc
     plunit
+    protobufs
     RDF
     readline
     semweb
