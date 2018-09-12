@@ -55,12 +55,11 @@ libtotex(Lib, Out, Options) :-
 ensure_doc_loaded(File) :-
 	(   doc_file_has_comments(File)
 	->  true
-	;   load_files(user:File, [if(true)]),
+	;   xref_source(File, [comments(store)]),
 	    (	doc_file_has_comments(File)
 	    ->	true
 	    ;	format(user_error, 'WARNING: no comments for ~w~n', [File])
 	    )
-	    %xref_source(File, [comments(store)])
 	).
 
 libtotex(Options, TxtFile) :-
