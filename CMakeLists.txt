@@ -33,6 +33,7 @@ set(SWIPL_PACKAGE_LIST
     inclpr
     jpl
     libedit
+    ltx2htm
     nlp
     odbc
     paxos
@@ -62,7 +63,9 @@ add_subdirectory(src)
 
 # Add the packages
 foreach(package ${SWIPL_PACKAGE_LIST})
-  add_subdirectory(packages/${package})
+  if(EXISTS packages/${package}/CMakeLists.txt)
+    add_subdirectory(packages/${package})
+  endif()
 endforeach(package)
 
 include(Pack)
