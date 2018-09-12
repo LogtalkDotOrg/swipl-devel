@@ -21,3 +21,5 @@ cmake -DCMAKE_TOOLCHAIN_FILE=../cmake/cross/linux_win64.cmake ..
   - Test Darwin and MinGW cross compilation
   - Create installers
   - chr compilaton depends on `swipl`, but *also* on the boot file.
+  - Install .qlf files
+  - Build library index after installation
