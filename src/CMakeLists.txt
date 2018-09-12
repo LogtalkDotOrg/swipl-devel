@@ -194,10 +194,7 @@ set(PL_LIB_INDEX ${SWIPL_LIBRARY_ROOT}/INDEX.pl)
 add_custom_target(
     vmi-metadata
     COMMAND mkvmi ${CMAKE_CURRENT_SOURCE_DIR}
-    BYPRODUCTS
-        ${CMAKE_CURRENT_SOURCE_DIR}/pl-vmi.h
-        ${CMAKE_CURRENT_SOURCE_DIR}/pl-codetable.c
-        ${CMAKE_CURRENT_SOURCE_DIR}/pl-jumptable.ic
+    BYPRODUCTS pl-vmi.h pl-codetable.c pl-jumptable.ic
     DEPENDS pl-vmi.c
     COMMENT "Generating VMI metadata"
 )
@@ -205,9 +202,7 @@ add_custom_target(
 add_custom_target(
     core-constants
     COMMAND defatom ${CMAKE_CURRENT_SOURCE_DIR}
-    BYPRODUCTS
-        ${CMAKE_CURRENT_SOURCE_DIR}/pl-atom.ih
-	${CMAKE_CURRENT_SOURCE_DIR}/pl-funct.ih
+    BYPRODUCTS pl-atom.ih pl-funct.ih
     DEPENDS ATOMS
     COMMENT "Generating static atoms and functors"
 )
