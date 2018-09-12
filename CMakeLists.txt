@@ -61,6 +61,9 @@ enable_testing()
 # Add the core Prolog system
 add_subdirectory(src)
 
+# build the documentation
+add_subdirectory(man)
+
 # Add the packages
 foreach(package ${SWIPL_PACKAGE_LIST})
   if(EXISTS ${CMAKE_SOURCE_DIR}/packages/${package}/CMakeLists.txt)

@@ -194,7 +194,7 @@ set(PL_LIB_INDEX ${SWIPL_LIBRARY_ROOT}/INDEX.pl)
 add_custom_target(
     vmi-metadata
     COMMAND mkvmi ${CMAKE_CURRENT_SOURCE_DIR}
-    BYPRODUCTS pl-vmi.h pl-codetable.c pl-jumptable.ic
+    BYPRODUCTS pl-vmi.h pl-codetable.ic pl-jumptable.ic
     DEPENDS pl-vmi.c
     COMMENT "Generating VMI metadata"
 )
