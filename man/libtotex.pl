@@ -71,6 +71,8 @@ libtotex(Options, TxtFile) :-
 	atomic_list_concat([Dir, '/summaries.d'], SummaryDir),
 	atomic_list_concat([SummaryDir, /, TeXLocalFile], SummaryTeXFile),
 	find_markdown_file(TxtFile, MarkDown, Options),
+	ensure_dir(Dir),
+	ensure_dir(SummaryDir),
 	doc_latex(MarkDown, TexFile,
 		  [ stand_alone(false),
 		    summary(SummaryTeXFile)
@@ -91,6 +93,7 @@ libtotex(Options, LibAtom) :-
 	atomic_list_concat([Dir, /, TeXLocalFile], TeXFile),
 	atomic_list_concat([Dir, '/summaries.d'], SummaryDir),
 	atomic_list_concat([SummaryDir, /, TeXLocalFile], SummaryTeXFile),
+	ensure_dir(Dir),
 	ensure_dir(SummaryDir),
 	libtotex(File, TeXFile,
 		 [ summary(SummaryTeXFile)
