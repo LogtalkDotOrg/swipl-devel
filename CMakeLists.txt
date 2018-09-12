@@ -63,8 +63,10 @@ add_subdirectory(src)
 
 # Add the packages
 foreach(package ${SWIPL_PACKAGE_LIST})
-  if(EXISTS packages/${package}/CMakeLists.txt)
+  if(EXISTS ${CMAKE_SOURCE_DIR}/packages/${package}/CMakeLists.txt)
     add_subdirectory(packages/${package})
+  else()
+    message("-- Skipping package ${package}")
   endif()
 endforeach(package)
 
