@@ -290,6 +290,7 @@ add_executable(swipl-ld swipl-ld.c)
 target_include_directories(swipl-ld BEFORE PRIVATE
 			   ${CMAKE_CURRENT_BINARY_DIR}
 			   ${CMAKE_CURRENT_SOURCE_DIR})
+add_dependencies(swipl-ld vmi-metadata core-constants)
 
 if(WIN32)
 include(WindowsTargets)
