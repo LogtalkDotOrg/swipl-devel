@@ -5,18 +5,34 @@ set(LIBTOTEX ${CMAKE_INSTALL_PREFIX}/bin/swipl libtotex.pl --)
 
 set(DOC SWI-Prolog-${SWIPL_VERSION_STRING})
 
-set(TEX_LIB library.tex readutil.tex wwwbrowser.tex registry.tex
-    check.tex url.tex debug.tex lists.tex bounds.tex clpqr.tex gensym.tex
-    nbset.tex libsummary.tex prologpack.tex assoc.tex assoclib.tex
-    prologxref.tex ugraphs.tex ordsets.tex broadcast.tex record.tex
-    clpfd.tex clpfdlib.tex pairs.tex option.tex main.tex apply.tex
-    aggregate.tex threadpool.tex pio.tex pureinput.tex charsio.tex shlib.tex
-    csv.tex optparse.tex clpb.tex clpblib.tex predicateoptions.tex
-    predopts.tex random.tex varnumbers.tex quasiquotations.tex
-    solutionsequences.tex iostream.tex persistency.tex yall.tex error.tex
-    simplex.tex simplexlib.tex dicts.tex)
-prepend(TEX_LIB lib/ ${TEX_LIB})
+# Libraries documented in .doc files
+set(DOC_LIB assoc.tex broadcast.tex clpb.tex clpfd.tex clpqr.tex gensym.tex
+    library.tex libsummary.tex nbset.tex pio.tex predicateoptions.tex
+    prologxref.tex readutil.tex record.tex registry.tex simplex.tex
+    ugraphs.tex wwwbrowser.tex)
+prepend(DOC_LIB lib/ ${DOC_LIB})
 
+# Libraries documented using PlDoc
+set(PLDOC_LIB check.tex url.tex debug.tex lists.tex
+    prologpack.tex assoclib.tex ordsets.tex clpfdlib.tex pairs.tex
+    option.tex main.tex apply.tex aggregate.tex threadpool.tex pureinput.tex
+    charsio.tex shlib.tex csv.tex optparse.tex clpblib.tex predopts.tex
+    random.tex varnumbers.tex quasiquotations.tex solutionsequences.tex
+    iostream.tex persistency.tex yall.tex error.tex simplexlib.tex
+    dicts.tex)
+prepend(PLDOC_LIB lib/ ${PLDOC_LIB})
+
+set(TEX_LIB ${DOC_LIB} ${PLDOC_LIB})
+
+foreach(f ${PLDOC_LIB})
+  string(REGEX REPLACE "\\.tex" ".doc" docin ${f})
+  if(EXISTS ${CMAKE_CURRENT_SOURCE_DIR}/${docin})
+    message("WARNING: DOC file for ${f}")
+  endif()
+endforeach()
+
+
+# Main files
 set(TEXFILES ${DOC}.tex intro.tex overview.tex builtin.tex module.tex
     foreign.tex runtime.tex hack.tex summary.tex xpce.tex glossary.tex
     ide.tex license.tex threads.tex engines.tex profile.tex
@@ -25,14 +41,18 @@ set(TEXFILES ${DOC}.tex intro.tex overview.tex builtin.tex module.tex
 
 set(STYFILES html.sty txt.sty)
 
-foreach(f ${TEXFILES})
+function(doc2tex)
+  foreach(f ${ARGN})
     string(REGEX REPLACE "\\.tex" ".doc" docin ${f})
     add_custom_command(
-	OUTPUT ${f}
+	OUTPUT ${CMAKE_CURRENT_SOURCE_DIR}/${f}
 	COMMAND ./doc2tex ${docin} > ${f}
 	DEPENDS ${docin}
 	WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR})
-endforeach()
+  endforeach()
+endfunction()
+
+doc2tex(${TEXFILES})
 
 # pldoc(tex input
 #	[OPTIONS ...]
@@ -65,7 +85,8 @@ function(pldoc tex input)
 endfunction()
 
 function(libdoc lib)
-  pldoc(lib/${lib}.tex "library(${lib})" ${ARGN})
+  string(REGEX REPLACE "_" "" texf ${lib})
+  pldoc(lib/${texf}.tex "library(${lib})" ${ARGN})
 endfunction()
 
 function(libsdoc)
@@ -89,9 +110,14 @@ pldoc(lib/clpblib.tex lib/clpblib.md
 pldoc(lib/clpfdlib.tex lib/clpfdlib.md
       OPTIONS --lib=clpfd --module=clpfd
       DEPENDS lib/clpfdlib.md ../library/clp/clpfd.pl)
+pldoc(lib/simplexlib.tex lib/simplexlib.md
+      OPTIONS --lib=simplex --module=simplex
+      DEPENDS lib/simplexlib.md ../library/clp/simplex.pl)
 pldoc(lib/predopts.tex lib/predopts.txt
       OPTIONS --lib=predicate_options
       DEPENDS lib/predopts.txt ../library/predicate_options.pl)
+
+doc2tex(${DOC_LIB})
 
 add_custom_command(
     OUTPUT ${DOC}.pdf
