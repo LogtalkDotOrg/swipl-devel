@@ -1,10 +1,11 @@
 cmake_minimum_required(VERSION 2.8.12)
 project(swipl-doc-core)
 
-set(SWIPL    ${CMAKE_INSTALL_PREFIX}/bin/swipl)
-set(DOC2TEX  ${CMAKE_CURRENT_SOURCE_DIR}/doc2tex)
-set(RUNTEX   ${CMAKE_CURRENT_SOURCE_DIR}/runtex)
-set(LIBTOTEX ${SWIPL} ${CMAKE_CURRENT_SOURCE_DIR}/libtotex.pl --)
+set(SWIPL      ${CMAKE_INSTALL_PREFIX}/bin/swipl)
+set(LATEX2HTML ${CMAKE_INSTALL_PREFIX}/lib/swipl/bin/latex2html)
+set(DOC2TEX    ${CMAKE_CURRENT_SOURCE_DIR}/doc2tex)
+set(RUNTEX     ${CMAKE_CURRENT_SOURCE_DIR}/runtex)
+set(LIBTOTEX   ${SWIPL} ${CMAKE_CURRENT_SOURCE_DIR}/libtotex.pl --)
 
 set(DOC SWI-Prolog-${SWIPL_VERSION_STRING})
 
@@ -82,7 +83,6 @@ function(pldoc tex input)
 
     get_filename_component(base ${tex} NAME_WE)
     set(byproducts lib/summaries.d/${base}.tex)
-    message("${tex} ${byproducts}")
 
     foreach(arg ${ARGN})
       if(arg MATCHES "^--")
@@ -158,13 +158,26 @@ add_custom_command(
     COMMAND env TEXINPUTS=lib:$$TEXINPUTS ${RUNTEX} --pdf ${DOC}
     DEPENDS ${TEXFILES})
 
+# Create the HTML manual
+add_custom_command(
+    OUTPUT manual.html
+    COMMAND rm -f Manual/*.html Manual/*.gif
+    COMMAND echo ${LATEX2HTML} ${DOC}
+    COMMAND env TEXINPUTS=lib:: ${LATEX2HTML} ${DOC}
+    COMMAND touch manual.html
+    DEPENDS ${TEXFILES} ${CMAKE_CURRENT_BINARY_DIR}/${DOC}.bbl)
+
 ################
 # Targets
 
 add_custom_target(
     doc
-    DEPENDS ${DOC}.pdf)
+    DEPENDS ${CMAKE_CURRENT_BINARY_DIR}/${DOC}.pdf
+	    ${CMAKE_CURRENT_BINARY_DIR}/manual.html)
 
 add_custom_target(
-    try
-    DEPENDS ${CMAKE_CURRENT_BINARY_DIR}/lib/assoclib.tex)
+    doc.html
+    DEPENDS ${CMAKE_CURRENT_BINARY_DIR}/manual.html)
+add_custom_target(
+    doc.pdf
+    DEPENDS ${CMAKE_CURRENT_BINARY_DIR}/${DOC}.pdf)
