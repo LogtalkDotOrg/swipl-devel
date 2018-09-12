@@ -8,6 +8,16 @@ set(LIBTOTEX ${SWIPL} ${CMAKE_CURRENT_SOURCE_DIR}/libtotex.pl --)
 
 set(DOC SWI-Prolog-${SWIPL_VERSION_STRING})
 
+set(TEX_CLEAN_EXTENSIONS aux bbl blg idx ilg ind log out toc)
+
+function(tex_byproducts doc out)
+  set(list)
+  foreach(e ${TEX_CLEAN_EXTENSIONS})
+    set(list ${list} ${doc}.${e})
+  endforeach()
+  set(${out} ${list} PARENT_SCOPE)
+endfunction()
+
 # Libraries documented in .doc files
 set(DOC_LIB assoc.tex broadcast.tex clpb.tex clpfd.tex clpqr.tex gensym.tex
     library.tex libsummary.tex nbset.tex pio.tex predicateoptions.tex
@@ -63,11 +73,16 @@ doc2tex(${DOC_CORE})
 function(pldoc tex input)
     set(options --source=${CMAKE_CURRENT_SOURCE_DIR})
     set(depends)
+    set(byproducts)
 
     if(input MATCHES "^library")
-      string(REGEX REPLACE "library\\((.*)\\)" "../library/\\1.pl"
-	     depends ${input})
+      string(REGEX REPLACE "library\\((.*)\\)" "\\1" base ${input})
+      set(depends "../library/${base}.pl")
     endif()
+
+    get_filename_component(base ${tex} NAME_WE)
+    set(byproducts lib/summaries.d/${base}.tex)
+    message("${tex} ${byproducts}")
 
     foreach(arg ${ARGN})
       if(arg MATCHES "^--")
@@ -80,7 +95,7 @@ function(pldoc tex input)
     endforeach()
 
     add_custom_command(
-	OUTPUT  ${tex}
+	OUTPUT  ${tex} ${byproducts}
 	COMMAND ${LIBTOTEX} ${options} "'${input}'"
 	DEPENDS ${depends})
 endfunction()
@@ -120,11 +135,7 @@ pldoc(lib/predopts.tex lib/predopts.txt
 
 doc2tex(${DOC_LIB})
 
-prepend(TEXFILES ${CMAKE_CURRENT_BINARY_DIR}/ ${DOC}.tex ${DOC_CORE} ${TEX_LIB})
-add_custom_command(
-    OUTPUT  ${DOC}.pdf
-    COMMAND env TEXINPUTS=lib:$$TEXINPUTS ${RUNTEX} --pdf ${DOC}
-    DEPENDS ${TEXFILES})
+# Create SWI-Prolog-<version>.tex
 
 add_custom_command(
     OUTPUT  ${DOC}.doc
@@ -136,6 +147,16 @@ add_custom_command(
     COMMAND ${DOC2TEX} ${DOC}.doc > ${DOC}.tex
     DEPENDS ${CMAKE_CURRENT_BINARY_DIR}/${DOC}.doc)
 
+# Collect all input files
+prepend(TEXFILES ${CMAKE_CURRENT_BINARY_DIR}/ ${DOC}.tex ${DOC_CORE} ${TEX_LIB})
+# Collect by products
+string(REPLACE ".tex" ".aux" AUX_FILES "${DOC_CORE}")
+tex_byproducts(${DOC} TEX_BYPRODUCTS)
+# Build SWI-Prolog-<version>.pdf
+add_custom_command(
+    OUTPUT  ${DOC}.pdf ${TEX_BYPRODUCTS} ${AUX_FILES}
+    COMMAND env TEXINPUTS=lib:$$TEXINPUTS ${RUNTEX} --pdf ${DOC}
+    DEPENDS ${TEXFILES})
 
 ################
 # Targets
