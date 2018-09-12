@@ -1,7 +1,8 @@
 cmake_minimum_required(VERSION 2.8.12)
 project(swipl-doc-core)
 
-set(LIBTOTEX ${CMAKE_INSTALL_PREFIX}/bin/swipl libtotex.pl --)
+set(SWIPL ${CMAKE_INSTALL_PREFIX}/bin/swipl)
+set(LIBTOTEX ${SWIPL} libtotex.pl --)
 
 set(DOC SWI-Prolog-${SWIPL_VERSION_STRING})
 
@@ -33,7 +34,7 @@ endforeach()
 
 
 # Main files
-set(TEXFILES ${DOC}.tex intro.tex overview.tex builtin.tex module.tex
+set(DOC_CORE ${DOC}.tex intro.tex overview.tex builtin.tex module.tex
     foreign.tex runtime.tex hack.tex summary.tex xpce.tex glossary.tex
     ide.tex license.tex threads.tex engines.tex profile.tex
     attvar.tex chr.tex xref.tex bit64.tex dialect.tex extensions.tex
@@ -52,7 +53,7 @@ function(doc2tex)
   endforeach()
 endfunction()
 
-doc2tex(${TEXFILES})
+doc2tex(${DOC_CORE})
 
 # pldoc(tex input
 #	[OPTIONS ...]
@@ -120,19 +121,25 @@ pldoc(lib/predopts.tex lib/predopts.txt
 doc2tex(${DOC_LIB})
 
 add_custom_command(
-    OUTPUT ${DOC}.pdf
+    OUTPUT ${CMAKE_CURRENT_SOURCE_DIR}/${DOC}.pdf
     COMMAND env TEXINPUTS=lib:$$TEXINPUTS ./runtex --pdf ${DOC}
-    DEPENDS ${TEXINPUTS} ${TEX_LIB}
+    DEPENDS ${DOC_CORE} ${TEX_LIB}
     WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR})
+
+add_custom_command(
+    OUTPUT ${CMAKE_CURRENT_SOURCE_DIR}/${DOC}.doc
+    COMMAND ${SWIPL} select.pl PDF main.doc > ${DOC}.doc
+    WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR})
+doc2tex(${DOC}.tex)
+
+
+################
+# Targets
 
 add_custom_target(
     doc
-    DEPENDS ${DOC}.pdf)
-
-#set(LIBS apply.tex dicts.tex shlib.tex assoclib.tex)
-#set(LIBS clpblib.tex clpfdlib.tex)
-prepend(LIBS ${CMAKE_CURRENT_SOURCE_DIR}/ ${TEX_LIB})
+    DEPENDS ${CMAKE_CURRENT_SOURCE_DIR}/${DOC}.pdf)
 
 add_custom_target(
     try
-    DEPENDS ${LIBS})
+    DEPENDS ${CMAKE_CURRENT_SOURCE_DIR}/${DOC}.tex)
