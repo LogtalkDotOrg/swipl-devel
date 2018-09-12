@@ -70,7 +70,8 @@ libtotex(Options, TxtFile) :-
 	file_base_name(TexFile, TeXLocalFile),
 	atomic_list_concat([Dir, '/summaries.d'], SummaryDir),
 	atomic_list_concat([SummaryDir, /, TeXLocalFile], SummaryTeXFile),
-	doc_latex(TxtFile, TexFile,
+	find_markdown_file(TxtFile, MarkDown, Options),
+	doc_latex(MarkDown, TexFile,
 		  [ stand_alone(false),
 		    summary(SummaryTeXFile)
 		  | Options
@@ -116,6 +117,15 @@ load_prolog([load(File)|T0], T) :- !,
 load_prolog([H|T0], [H|T]) :-
 	load_prolog(T0, T).
 
+find_markdown_file(Spec, File, _Options) :-
+	exists_file(Spec), !,
+	File = Spec.
+find_markdown_file(Spec, File, Options) :-
+	option(source(Dir), Options),
+	atomic_list_concat([Dir,/,Spec], File),
+	exists_file(File).
+find_markdown_file(Spec, _File, _Options) :-
+	existence_error(markdown_file, Spec).
 
 main(Argv) :-
 	partition(is_option, Argv, OptArgs, Files),
@@ -140,4 +150,6 @@ to_option(Opt, load(File)) :-
 	atom_to_term(Atom, File, _).
 to_option(Opt, load(library(File))) :-
 	atom_concat('--lib=', File, Opt).
+to_option(Opt, source(Source)) :-
+	atom_concat('--source=', Source, Opt).
 

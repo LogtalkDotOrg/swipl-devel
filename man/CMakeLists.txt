@@ -1,8 +1,10 @@
 cmake_minimum_required(VERSION 2.8.12)
 project(swipl-doc-core)
 
-set(SWIPL ${CMAKE_INSTALL_PREFIX}/bin/swipl)
-set(LIBTOTEX ${SWIPL} libtotex.pl --)
+set(SWIPL    ${CMAKE_INSTALL_PREFIX}/bin/swipl)
+set(DOC2TEX  ${CMAKE_CURRENT_SOURCE_DIR}/doc2tex)
+set(RUNTEX   ${CMAKE_CURRENT_SOURCE_DIR}/runtex)
+set(LIBTOTEX ${SWIPL} ${CMAKE_CURRENT_SOURCE_DIR}/libtotex.pl --)
 
 set(DOC SWI-Prolog-${SWIPL_VERSION_STRING})
 
@@ -34,7 +36,7 @@ endforeach()
 
 
 # Main files
-set(DOC_CORE ${DOC}.tex intro.tex overview.tex builtin.tex module.tex
+set(DOC_CORE intro.tex overview.tex builtin.tex module.tex
     foreign.tex runtime.tex hack.tex summary.tex xpce.tex glossary.tex
     ide.tex license.tex threads.tex engines.tex profile.tex
     attvar.tex chr.tex xref.tex bit64.tex dialect.tex extensions.tex
@@ -46,10 +48,9 @@ function(doc2tex)
   foreach(f ${ARGN})
     string(REGEX REPLACE "\\.tex" ".doc" docin ${f})
     add_custom_command(
-	OUTPUT ${CMAKE_CURRENT_SOURCE_DIR}/${f}
-	COMMAND ./doc2tex ${docin} > ${f}
-	DEPENDS ${docin}
-	WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR})
+	OUTPUT ${f}
+	COMMAND ${DOC2TEX} ${CMAKE_CURRENT_SOURCE_DIR}/${docin} > ${f}
+	DEPENDS ${docin})
   endforeach()
 endfunction()
 
@@ -60,7 +61,7 @@ doc2tex(${DOC_CORE})
 #	[DEPENDS ...]
 
 function(pldoc tex input)
-    set(options)
+    set(options --source=${CMAKE_CURRENT_SOURCE_DIR})
     set(depends)
 
     if(input MATCHES "^library")
@@ -79,10 +80,9 @@ function(pldoc tex input)
     endforeach()
 
     add_custom_command(
-	OUTPUT ${CMAKE_CURRENT_SOURCE_DIR}/${tex}
+	OUTPUT  ${tex}
 	COMMAND ${LIBTOTEX} ${options} "'${input}'"
-	DEPENDS ${depends}
-	WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR})
+	DEPENDS ${depends})
 endfunction()
 
 function(libdoc lib)
@@ -120,17 +120,21 @@ pldoc(lib/predopts.tex lib/predopts.txt
 
 doc2tex(${DOC_LIB})
 
+prepend(TEXFILES ${CMAKE_CURRENT_BINARY_DIR}/ ${DOC}.tex ${DOC_CORE} ${TEX_LIB})
 add_custom_command(
-    OUTPUT ${CMAKE_CURRENT_SOURCE_DIR}/${DOC}.pdf
-    COMMAND env TEXINPUTS=lib:$$TEXINPUTS ./runtex --pdf ${DOC}
-    DEPENDS ${DOC_CORE} ${TEX_LIB}
-    WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR})
+    OUTPUT  ${DOC}.pdf
+    COMMAND env TEXINPUTS=lib:$$TEXINPUTS ${RUNTEX} --pdf ${DOC}
+    DEPENDS ${TEXFILES})
 
 add_custom_command(
-    OUTPUT ${CMAKE_CURRENT_SOURCE_DIR}/${DOC}.doc
-    COMMAND ${SWIPL} select.pl PDF main.doc > ${DOC}.doc
-    WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR})
-doc2tex(${DOC}.tex)
+    OUTPUT  ${DOC}.doc
+    COMMAND ${SWIPL} ${CMAKE_CURRENT_SOURCE_DIR}/select.pl PDF
+                     ${CMAKE_CURRENT_SOURCE_DIR}/main.doc > ${DOC}.doc
+    DEPENDS main.doc select.pl)
+add_custom_command(
+    OUTPUT  ${DOC}.tex
+    COMMAND ${DOC2TEX} ${DOC}.doc > ${DOC}.tex
+    DEPENDS ${CMAKE_CURRENT_BINARY_DIR}/${DOC}.doc)
 
 
 ################
@@ -138,8 +142,8 @@ doc2tex(${DOC}.tex)
 
 add_custom_target(
     doc
-    DEPENDS ${CMAKE_CURRENT_SOURCE_DIR}/${DOC}.pdf)
+    DEPENDS ${DOC}.pdf)
 
 add_custom_target(
     try
-    DEPENDS ${CMAKE_CURRENT_SOURCE_DIR}/${DOC}.tex)
+    DEPENDS ${CMAKE_CURRENT_BINARY_DIR}/lib/assoclib.tex)
