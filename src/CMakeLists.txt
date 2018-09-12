@@ -190,24 +190,25 @@ set(PL_LIB_INDEX ${SWIPL_LIBRARY_ROOT}/INDEX.pl)
 # Custom targets and commands
 ################
 
-# FIXME: should we create these in the build directory?
-# FIXME: it is not allowed to have multiple OUTPUT that appear in
-# the dependencies of independent targets.  This is supposed to use
-# add_custom_target(), but that will force the build regardless of
-# whether this is out of date, forcing rebuilding the entire remainder
-add_custom_command(
-    OUTPUT  ${CMAKE_CURRENT_SOURCE_DIR}/pl-codetable.c
-	    ${CMAKE_CURRENT_SOURCE_DIR}/pl-jumptable.ic
-            ${CMAKE_CURRENT_SOURCE_DIR}/pl-vmi.h
+# FIXME: we should create these in the build directory
+add_custom_target(
+    vmi-metadata
     COMMAND mkvmi ${CMAKE_CURRENT_SOURCE_DIR}
-    DEPENDS mkvmi pl-vmi.c
+    BYPRODUCTS
+        ${CMAKE_CURRENT_SOURCE_DIR}/pl-vmi.h
+        ${CMAKE_CURRENT_SOURCE_DIR}/pl-codetable.c
+        ${CMAKE_CURRENT_SOURCE_DIR}/pl-jumptable.ic
+    DEPENDS pl-vmi.c
     COMMENT "Generating VMI metadata"
 )
 
-add_custom_command(
-    OUTPUT  pl-atom.ih pl-funct.ih
+add_custom_target(
+    core-constants
     COMMAND defatom ${CMAKE_CURRENT_SOURCE_DIR}
-    DEPENDS defatom ATOMS
+    BYPRODUCTS
+        ${CMAKE_CURRENT_SOURCE_DIR}/pl-atom.ih
+	${CMAKE_CURRENT_SOURCE_DIR}/pl-funct.ih
+    DEPENDS ATOMS
     COMMENT "Generating static atoms and functors"
 )
 
@@ -278,7 +279,7 @@ target_link_libraries(swipl libswipl)
 
 # build the library
 add_library(libswipl ${LIBSWIPL_SRC} ${HDR_CORE})
-add_dependencies(libswipl version.h)
+add_dependencies(libswipl version.h vmi-metadata core-constants)
 set_target_properties(libswipl PROPERTIES
 		      OUTPUT_NAME swipl
 		      VERSION ${SWIPL_VERSION_STRING}
