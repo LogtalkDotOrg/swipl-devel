@@ -187,3 +187,5 @@ function(has_package name var)
     set(var OFF)
   endif()
 endfunction()
+
+include(PackageDoc)
