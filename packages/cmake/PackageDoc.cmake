@@ -57,4 +57,14 @@ function(pkg_doc pkg)
   add_custom_target(
       ${pkg}.doc.pdf
       DEPENDS ${pkg}.pdf)
+
+  add_custom_command(
+      OUTPUT ${pkg}.html
+      COMMAND ${LATEX2HTML} ${pkg}
+      DEPENDS ${pkg}.tex ${texfiles})
+
+  add_custom_target(
+      ${pkg}.doc.html
+      DEPENDS ${pkg}.html)
+
 endfunction()
