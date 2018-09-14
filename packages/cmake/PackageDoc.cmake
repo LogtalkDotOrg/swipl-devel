@@ -39,12 +39,15 @@ endfunction()
 function(pldoc file)
   set(tex)
   set(lib)
+  set(options)
 
   foreach(arg ${ARGN})
     if(arg MATCHES ".*\\.tex")
       set(tex ${arg})
     elseif(arg MATCHES "library")
       set(lib "\"${arg}\"")
+    elseif(arg MATCHES "^--")
+      set(options ${options} ${arg})
     endif()
   endforeach()
 
@@ -69,7 +72,7 @@ function(pldoc file)
   get_filename_component(base ${file} NAME_WE)
   add_custom_command(
       OUTPUT ${tex}
-      COMMAND ${PLTOTEX} --out=${tex} ${seclevel} ${lib}
+      COMMAND ${PLTOTEX} --out=${tex} ${seclevel} ${options} ${lib}
       DEPENDS ${file})
 
   set(texfiles ${texfiles} ${tex} PARENT_SCOPE)
