@@ -172,3 +172,16 @@ add_custom_target(
 
 # Add to the toplevel `doc` target
 add_dependencies(doc core.doc.pdf core.doc.html)
+
+################
+# Installation
+
+if(INSTALL_DOCUMENTATION)
+  if(EXISTS ${CMAKE_CURRENT_SOURCE_DIR}/Manual)
+    install(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/Manual
+	    DESTINATION ${SWIPL_INSTALL_PREFIX}/doc)
+  else()
+    install(DIRECTORY Manual
+	    DESTINATION ${SWIPL_INSTALL_PREFIX}/doc)
+  endif()
+endif()

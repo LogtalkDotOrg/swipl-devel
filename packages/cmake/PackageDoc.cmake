@@ -74,4 +74,13 @@ function(pkg_doc pkg)
 
   add_dependencies(doc ${pkg}.doc.pdf ${pkg}.doc.html)
 
+  if(INSTALL_DOCUMENTATION)
+    if(EXISTS ${CMAKE_CURRENT_SOURCE_DIR}/${pkg}.html)
+      install(FILES ${pkg}.html
+	      DESTINATION ${SWIPL_INSTALL_PREFIX}/doc/packages/)
+    else()
+      install(FILES ${pkg}.html
+	      DESTINATION ${SWIPL_INSTALL_PREFIX}/doc/packages/)
+    endif()
+  endif()
 endfunction()
