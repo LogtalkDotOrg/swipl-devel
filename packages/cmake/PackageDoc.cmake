@@ -1,9 +1,9 @@
-include(latex)
+include(Documentation)
 
 set(SWIPL      ${CMAKE_INSTALL_PREFIX}/bin/swipl)
-set(LATEX2HTML ${CMAKE_INSTALL_PREFIX}/lib/swipl/bin/latex2html)
+set(LATEX2HTML ${CMAKE_INSTALL_PREFIX}/lib/swipl/bin/latex2html ${DOC_OPTIONS})
 set(DOC2TEX    ${SWIPL_ROOT}/man/doc2tex)
-set(RUNTEX     ${SWIPL_ROOT}/man/runtex ${RUNTEX_OPTIONS})
+set(RUNTEX     ${SWIPL_ROOT}/man/runtex ${DOC_OPTIONS})
 set(PLTOTEX    ${SWIPL} ${SWIPL_ROOT}/packages/pltotex.pl --)
 
 function(doc2tex file)

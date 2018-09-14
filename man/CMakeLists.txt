@@ -1,12 +1,12 @@
 cmake_minimum_required(VERSION 2.8.12)
 project(swipl-doc-core)
 
-include(latex)
+include(Documentation)
 
 set(SWIPL      ${CMAKE_INSTALL_PREFIX}/bin/swipl)
-set(LATEX2HTML ${CMAKE_INSTALL_PREFIX}/lib/swipl/bin/latex2html)
+set(LATEX2HTML ${CMAKE_INSTALL_PREFIX}/lib/swipl/bin/latex2html ${DOC_OPTIONS})
 set(DOC2TEX    ${CMAKE_CURRENT_SOURCE_DIR}/doc2tex)
-set(RUNTEX     ${CMAKE_CURRENT_SOURCE_DIR}/runtex ${RUNTEX_OPTIONS})
+set(RUNTEX     ${CMAKE_CURRENT_SOURCE_DIR}/runtex ${DOC_OPTIONS})
 set(LIBTOTEX   ${SWIPL} ${CMAKE_CURRENT_SOURCE_DIR}/libtotex.pl --)
 
 set(DOC SWI-Prolog-${SWIPL_VERSION_STRING})
@@ -148,7 +148,8 @@ tex_byproducts(${DOC} TEX_BYPRODUCTS)
 add_custom_command(
     OUTPUT  ${DOC}.pdf ${TEX_BYPRODUCTS} ${AUX_FILES}
     COMMAND env TEXINPUTS=lib:$$TEXINPUTS ${RUNTEX} --pdf ${DOC}
-    DEPENDS ${TEXFILES})
+    DEPENDS ${TEXFILES}
+    COMMENT "Generating ${DOC}.pdf")
 
 # Create the HTML manual
 add_custom_command(
