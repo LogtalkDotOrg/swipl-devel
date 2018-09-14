@@ -171,13 +171,11 @@ add_custom_command(
 # Targets
 
 add_custom_target(
-    doc
-    DEPENDS ${CMAKE_CURRENT_BINARY_DIR}/${DOC}.pdf
-	    ${CMAKE_CURRENT_BINARY_DIR}/manual.html)
-
-add_custom_target(
-    doc.html
+    core.doc.html
     DEPENDS ${CMAKE_CURRENT_BINARY_DIR}/manual.html)
 add_custom_target(
-    doc.pdf
+    core.doc.pdf
     DEPENDS ${CMAKE_CURRENT_BINARY_DIR}/${DOC}.pdf)
+
+# Add to the toplevel `doc` target
+add_dependencies(doc core.doc.pdf core.doc.html)

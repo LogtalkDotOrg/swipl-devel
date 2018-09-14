@@ -67,4 +67,6 @@ function(pkg_doc pkg)
       ${pkg}.doc.html
       DEPENDS ${pkg}.html)
 
+  add_dependencies(doc ${pkg}.doc.pdf ${pkg}.doc.html)
+
 endfunction()

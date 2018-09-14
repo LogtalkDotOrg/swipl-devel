@@ -62,6 +62,9 @@ enable_testing()
 add_subdirectory(src)
 
 # build the documentation
+add_custom_target(
+    doc
+    COMMENT "Build the documentation")
 add_subdirectory(man)
 
 # Add the packages
@@ -73,4 +76,5 @@ foreach(package ${SWIPL_PACKAGE_LIST})
   endif()
 endforeach(package)
 
+# Packaging
 include(Pack)
