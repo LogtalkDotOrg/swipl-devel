@@ -5,15 +5,34 @@ set(LATEX2HTML ${CMAKE_INSTALL_PREFIX}/lib/swipl/bin/latex2html ${DOC_OPTIONS})
 set(DOC2TEX    ${SWIPL_ROOT}/man/doc2tex)
 set(RUNTEX     ${SWIPL_ROOT}/man/runtex ${DOC_OPTIONS})
 set(PLTOTEX    ${SWIPL} ${SWIPL_ROOT}/packages/pltotex.pl --)
+set(TXTTOTEX   ${SWIPL} ${SWIPL_ROOT}/packages/txttotex.pl --)
 
 function(doc2tex file)
-  string(REPLACE ".doc" "" file ${file})
-  set(texfiles ${texfiles} ${file}.tex PARENT_SCOPE)
+  string(REPLACE ".doc" ".tex" tex ${file})
   add_custom_command(
-      OUTPUT ${file}.tex
-      COMMAND ${DOC2TEX} ${CMAKE_CURRENT_SOURCE_DIR}/${file}.doc > ${file}.tex
-      DEPENDS ${file}.doc)
+      OUTPUT ${tex}
+      COMMAND ${DOC2TEX} ${CMAKE_CURRENT_SOURCE_DIR}/${file} > ${tex}
+      DEPENDS ${file})
+  set(texfiles ${texfiles} ${tex} PARENT_SCOPE)
 endfunction()
+
+function(txt2tex file)
+  string(REPLACE ".txt" ".tex" tex ${file})
+  add_custom_command(
+      OUTPUT ${tex}
+      COMMAND ${TXTTOTEX} ${CMAKE_CURRENT_SOURCE_DIR}/${file}
+      DEPENDS ${file})
+  set(texfiles ${texfiles} ${tex} PARENT_SCOPE)
+endfunction()
+
+function(copy_image img)
+  add_custom_command(
+      OUTPUT ${img}
+      COMMAND ${CMAKE_COMMAND} -E copy_if_different
+              ${CMAKE_CURRENT_SOURCE_DIR}/${img} ${img})
+  set(images ${images} ${img} PARENT_SCOPE)
+endfunction()
+
 
 # pldoc file.pl [out.tex] [library(lib)]
 
@@ -36,14 +55,17 @@ function(pldoc file)
 
   if(NOT lib)
     get_filename_component(base ${file} NAME_WE)
-    set(lib "\"library('${base}')\"")
+    if(libsubdir)
+      set(lib "\"library('${libsubdir}/${base}')\"")
+    else()
+      set(lib "\"library('${base}')\"")
+    endif()
   endif()
 
   get_filename_component(base ${file} NAME_WE)
   add_custom_command(
       OUTPUT ${tex}
-      COMMAND echo "--out=${tex} ${lib}"
-      COMMAND ${PLTOTEX} --out=${tex} ${lib}
+      COMMAND ${PLTOTEX} --out=${tex} ${seclevel} ${lib}
       DEPENDS ${file})
 
   set(texfiles ${texfiles} ${tex} PARENT_SCOPE)
@@ -66,7 +88,10 @@ function(pkg_doc pkg)
   set(docfiles)
   set(mode)
   set(texfiles)
+  set(images)
   set(src)
+  set(seclevel)
+  set(libsubdir)
 
   foreach(arg ${ARGN})
     if(arg STREQUAL "SOURCES")
@@ -76,26 +101,42 @@ function(pkg_doc pkg)
       flush_src()
       set(mode source)
       set(src)
+    elseif(arg STREQUAL "LIBSUBDIR")
+      set(mode lbsubdir)
+    elseif(arg STREQUAL "SECTION")
+      set(seclevel --section)
+    elseif(arg STREQUAL "SUBSECTION")
+      set(seclevel --subsection)
+    elseif(arg STREQUAL "SUBSUBSECTION")
+      set(seclevel --subsubsection)
     elseif(mode STREQUAL "source")
       set(src ${src} ${arg})
+    elseif(mode STREQUAL "lbsubdir")
+      set(libsubdir ${arg})
     else()
       if(arg MATCHES ".*\\.pl")
         pldoc(${arg})
       elseif(arg MATCHES ".*\\.doc")
         doc2tex(${arg})
+      elseif(arg MATCHES ".*\\.txt")
+        txt2tex(${arg})
+      elseif(arg MATCHES "\\.(gif|pdf|eps)")
+        copy_image(${arg})
       endif()
     endif()
   endforeach()
   flush_src()
 
-  doc2tex(${pkg})
+  doc2tex(${pkg}.doc)
 
   tex_byproducts(${pkg} byproducts)
+
+  prepend(texdeps ${CMAKE_CURRENT_BINARY_DIR}/ ${pkg}.tex ${texfiles} ${images})
 
   add_custom_command(
       OUTPUT ${pkg}.pdf ${byproducts}
       COMMAND ${RUNTEX} --pdf ${pkg}
-      DEPENDS ${pkg}.tex ${texfiles}
+      DEPENDS ${texdeps}
       COMMENT "Generating ${pkg}.pdf")
 
   add_custom_target(
@@ -105,7 +146,7 @@ function(pkg_doc pkg)
   add_custom_command(
       OUTPUT ${pkg}.html
       COMMAND ${LATEX2HTML} ${pkg}
-      DEPENDS ${pkg}.tex ${texfiles})
+      DEPENDS ${texdeps})
 
   add_custom_target(
       ${pkg}.doc.html
