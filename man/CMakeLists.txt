@@ -1,23 +1,15 @@
 cmake_minimum_required(VERSION 2.8.12)
 project(swipl-doc-core)
 
+include(latex)
+
 set(SWIPL      ${CMAKE_INSTALL_PREFIX}/bin/swipl)
 set(LATEX2HTML ${CMAKE_INSTALL_PREFIX}/lib/swipl/bin/latex2html)
 set(DOC2TEX    ${CMAKE_CURRENT_SOURCE_DIR}/doc2tex)
-set(RUNTEX     ${CMAKE_CURRENT_SOURCE_DIR}/runtex)
+set(RUNTEX     ${CMAKE_CURRENT_SOURCE_DIR}/runtex ${RUNTEX_OPTIONS})
 set(LIBTOTEX   ${SWIPL} ${CMAKE_CURRENT_SOURCE_DIR}/libtotex.pl --)
 
 set(DOC SWI-Prolog-${SWIPL_VERSION_STRING})
-
-set(TEX_CLEAN_EXTENSIONS aux bbl blg idx ilg ind log out toc)
-
-function(tex_byproducts doc out)
-  set(list)
-  foreach(e ${TEX_CLEAN_EXTENSIONS})
-    set(list ${list} ${doc}.${e})
-  endforeach()
-  set(${out} ${list} PARENT_SCOPE)
-endfunction()
 
 # Libraries documented in .doc files
 set(DOC_LIB assoc.tex broadcast.tex clpb.tex clpfd.tex clpqr.tex gensym.tex

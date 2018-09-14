@@ -8,6 +8,7 @@ format=dvi
 rerun='Rerun to get cross-references right'
 maxruns=4
 quiet=false
+mkindexopts=
 
 function texclean
 { rm -f *.idx *.ind *.ilg *.aux *.log *.lof *.out *.toc *.blg
@@ -44,7 +45,9 @@ case "$appbase" in
 	;;
 esac
 
-echo "runtex application base = $appbase"
+if [ $quiet == false ]; then
+  echo "runtex application base = $appbase"
+fi
 
 function addinput
 { if [ -z "$TEXINPUTS" ]; then
@@ -104,7 +107,8 @@ while [ $argp = true ] ; do
 	    format=dvi
 	    shift ;;
 	--quiet)
-	    quiet=true;
+	    quiet=true
+	    mkindexopts=-q
 	    shift ;;
 	--maxruns=*)
 	    maxruns="`echo $1 | sed 's/--maxruns=//'`"
@@ -159,9 +163,9 @@ while [ $cont != "no" ]; do
 	    $appbase/correctindex $doc.idx
 	fi
 	if [ -r $appbase/makeindex.ist ]; then
-	    makeindex -s $appbase/makeindex.ist $doc.idx
+	    makeindex $mkindexopts -s $appbase/makeindex.ist $doc.idx
 	else
-	    makeindex $doc.idx
+	    makeindex $mkindexopts $doc.idx
 	fi
     fi
     if test -r $doc.aux && grep -qw bibdata $doc.aux; then

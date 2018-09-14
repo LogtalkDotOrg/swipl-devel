@@ -1,7 +1,9 @@
+include(latex)
+
 set(SWIPL      ${CMAKE_INSTALL_PREFIX}/bin/swipl)
 set(LATEX2HTML ${CMAKE_INSTALL_PREFIX}/lib/swipl/bin/latex2html)
 set(DOC2TEX    ${SWIPL_ROOT}/man/doc2tex)
-set(RUNTEX     ${SWIPL_ROOT}/man/runtex)
+set(RUNTEX     ${SWIPL_ROOT}/man/runtex ${RUNTEX_OPTIONS})
 set(PLTOTEX    ${SWIPL} ${SWIPL_ROOT}/packages/pltotex.pl --)
 
 function(doc2tex file)
@@ -49,10 +51,13 @@ function(pkg_doc pkg)
 
   doc2tex(${pkg})
 
+  tex_byproducts(${pkg} byproducts)
+
   add_custom_command(
-      OUTPUT ${pkg}.pdf
+      OUTPUT ${pkg}.pdf ${byproducts}
       COMMAND ${RUNTEX} --pdf ${pkg}
-      DEPENDS ${pkg}.tex ${texfiles})
+      DEPENDS ${pkg}.tex ${texfiles}
+      COMMENT "Generating ${pkg}.pdf")
 
   add_custom_target(
       ${pkg}.doc.pdf
