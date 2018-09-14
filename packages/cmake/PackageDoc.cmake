@@ -7,47 +7,86 @@ set(RUNTEX     ${SWIPL_ROOT}/man/runtex ${DOC_OPTIONS})
 set(PLTOTEX    ${SWIPL} ${SWIPL_ROOT}/packages/pltotex.pl --)
 
 function(doc2tex file)
+  string(REPLACE ".doc" "" file ${file})
+  set(texfiles ${texfiles} ${file}.tex PARENT_SCOPE)
   add_custom_command(
       OUTPUT ${file}.tex
       COMMAND ${DOC2TEX} ${CMAKE_CURRENT_SOURCE_DIR}/${file}.doc > ${file}.tex
       DEPENDS ${file}.doc)
 endfunction()
 
+# pldoc file.pl [out.tex] [library(lib)]
+
+function(pldoc file)
+  set(tex)
+  set(lib)
+
+  foreach(arg ${ARGN})
+    if(arg MATCHES ".*\\.tex")
+      set(tex ${arg})
+    elseif(arg MATCHES "library")
+      set(lib "\"${arg}\"")
+    endif()
+  endforeach()
+
+  if(NOT tex)
+    string(REPLACE ".pl" ".tex" tex ${file})
+    string(REPLACE "_" "" tex ${tex})
+  endif()
+
+  if(NOT lib)
+    get_filename_component(base ${file} NAME_WE)
+    set(lib "\"library('${base}')\"")
+  endif()
+
+  get_filename_component(base ${file} NAME_WE)
+  add_custom_command(
+      OUTPUT ${tex}
+      COMMAND echo "--out=${tex} ${lib}"
+      COMMAND ${PLTOTEX} --out=${tex} ${lib}
+      DEPENDS ${file})
+
+  set(texfiles ${texfiles} ${tex} PARENT_SCOPE)
+endfunction()
+
+function(flush_src)
+  if(src)
+    pldoc(${src})
+  endif()
+  set(src "" PARENT_SCOPE)
+  set(texfiles ${texfiles} PARENT_SCOPE)
+endfunction()
+
+# pkg_doc(pkg
+#	  [ SOURCE file.pl [out.tex] [library(...)] ]*
+#	  [ SOURCES file.pl file.doc ... ])
+
 function(pkg_doc pkg)
   set(pldoc)
   set(docfiles)
   set(mode)
   set(texfiles)
+  set(src)
 
   foreach(arg ${ARGN})
     if(arg STREQUAL "SOURCES")
+      flush_src()
       set(mode sources)
+    elseif(arg STREQUAL "SOURCE")
+      flush_src()
+      set(mode source)
+      set(src)
+    elseif(mode STREQUAL "source")
+      set(src ${src} ${arg})
     else()
       if(arg MATCHES ".*\\.pl")
-        set(pldoc ${pldoc} ${arg})
+        pldoc(${arg})
       elseif(arg MATCHES ".*\\.doc")
-        set(docfiles ${docfiles} ${arg})
+        doc2tex(${arg})
       endif()
     endif()
   endforeach()
-
-  foreach(d ${pldoc})
-    string(REPLACE ".pl" ".tex" tex ${d})
-    string(REPLACE "_" "" tex ${tex})
-    set(texfiles ${texfiles} ${tex})
-    get_filename_component(base ${d} NAME_WE)
-    add_custom_command(
-	OUTPUT ${tex}
-	COMMAND ${PLTOTEX} "\"library('${base}')\""
-	DEPENDS ${d})
-  endforeach()
-
-  foreach(d ${docfiles})
-    string(REPLACE ".doc" "" base ${d})
-    string(REPLACE ".doc" ".tex" tex ${d})
-    set(texfiles ${texfiles} ${tex})
-    doc2tex(${base})
-  endforeach()
+  flush_src()
 
   doc2tex(${pkg})
 
