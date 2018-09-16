@@ -65,15 +65,17 @@ ensure_doc_loaded(File) :-
 libtotex(Options, TxtFile) :-
 	file_name_extension(Base, Ext, TxtFile),
 	markdown_ext(Ext), !,
-        file_name_extension(Base, tex, TexFile),
-	file_directory_name(TexFile, Dir),
-	file_base_name(TexFile, TeXLocalFile),
+        file_name_extension(Base, tex, AbsTeXFile),
+	file_directory_name(AbsTeXFile, Dir0),
+	file_base_name(AbsTeXFile, TeXLocalFile),
+	option(outdir(Dir), Options, Dir0),
+	atomic_list_concat([Dir, /, TeXLocalFile], TeXFile),
 	atomic_list_concat([Dir, '/summaries.d'], SummaryDir),
 	atomic_list_concat([SummaryDir, /, TeXLocalFile], SummaryTeXFile),
 	find_markdown_file(TxtFile, MarkDown, Options),
 	ensure_dir(Dir),
 	ensure_dir(SummaryDir),
-	doc_latex(MarkDown, TexFile,
+	doc_latex(MarkDown, TeXFile,
 		  [ stand_alone(false),
 		    summary(SummaryTeXFile)
 		  | Options
