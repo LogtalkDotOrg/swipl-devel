@@ -87,9 +87,10 @@ function(pldoc tex input)
     endforeach()
 
     add_custom_command(
-	OUTPUT  ${tex} ${byproducts}
+	OUTPUT  ${tex}
 	COMMAND ${LIBTOTEX} ${options} "'${input}'"
-	DEPENDS ${depends})
+	DEPENDS ${depends}
+	BYPRODUCTS ${byproducts})
 endfunction()
 
 function(libdoc lib)
@@ -144,11 +145,13 @@ prepend(TEXFILES ${CMAKE_CURRENT_BINARY_DIR}/ ${DOC}.tex ${DOC_CORE} ${TEX_LIB})
 # Collect by products
 string(REPLACE ".tex" ".aux" AUX_FILES "${DOC_CORE}")
 tex_byproducts(${DOC} TEX_BYPRODUCTS)
+
 # Build SWI-Prolog-<version>.pdf
 add_custom_command(
-    OUTPUT  ${DOC}.pdf ${TEX_BYPRODUCTS} ${AUX_FILES}
+    OUTPUT  ${DOC}.pdf
     COMMAND env TEXINPUTS=lib:$$TEXINPUTS ${RUNTEX} --pdf ${DOC}
     DEPENDS ${TEXFILES}
+    BYPRODUCTS ${TEX_BYPRODUCTS} ${AUX_FILES}
     COMMENT "Generating ${DOC}.pdf")
 
 # Create the HTML manual

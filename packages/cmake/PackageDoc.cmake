@@ -142,9 +142,10 @@ function(pkg_doc pkg)
   prepend(texdeps ${CMAKE_CURRENT_BINARY_DIR}/ ${pkg}.tex ${texfiles} ${images})
 
   add_custom_command(
-      OUTPUT ${pkg}.pdf ${byproducts}
+      OUTPUT ${pkg}.pdf
       COMMAND ${RUNTEX} --pdf ${pkg}
       DEPENDS ${texdeps}
+      BYPRODUCTS ${byproducts}
       COMMENT "Generating ${pkg}.pdf")
 
   add_custom_target(
