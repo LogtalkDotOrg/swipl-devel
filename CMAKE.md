@@ -18,9 +18,9 @@ cmake -DCMAKE_TOOLCHAIN_FILE=../cmake/cross/linux_win64.cmake ..
 # Issues
 
   - Build documention
-    - online plain text manual
-    - package docs
+    - online plain text manual?
   - Test Darwin and MinGW cross compilation
   - Create installers
   - Install .qlf files
+  - Install pkg-config files
   - Build library index after installation
