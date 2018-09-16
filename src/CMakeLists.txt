@@ -42,10 +42,6 @@ get_filename_component(SWIPL_ROOT "${CMAKE_CURRENT_SOURCE_DIR}/.." ABSOLUTE)
 set(SWIPL_LIBRARY_ROOT ${SWIPL_ROOT}/library)
 set(SWIPL_BOOT_ROOT ${SWIPL_ROOT}/boot)
 
-# Installation locations
-string(TOLOWER ${CMAKE_HOST_SYSTEM_PROCESSOR}-${CMAKE_HOST_SYSTEM_NAME}
-       SWIPL_ARCH)
-
 if(CMAKE_SIZEOF_VOID_P EQUAL 8)
   set(SWIPL_BOOT_FILE "boot64.prc")
 else()
