@@ -160,8 +160,8 @@ while [ $cont != "no" ]; do
 					# fix index problems
     if [ -r $doc.idx ]; then
 	cp $doc.idx $doc.idx.$$
-        if [ -x $appbase/correctindex ]; then
-	    $appbase/correctindex $doc.idx
+        if [ -r $appbase/correctindex ]; then
+	    perl -pi $appbase/correctindex $doc.idx
 	fi
 	if [ -r $appbase/makeindex.ist ]; then
 	    makeindex $mkindexopts -s $appbase/makeindex.ist $doc.idx

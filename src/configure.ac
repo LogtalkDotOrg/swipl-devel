@@ -1972,7 +1972,7 @@ echo "	CFLAGS=$CWFLAGS $COFLAGS $CIFLAGS $CMFLAGS"
 echo "	LDFLAGS=$LDFLAGS"
 echo "	LIBS=$LIBS"
 
-OutputFiles="Makefile libtai/Makefile ../man/Makefile ../man/correctindex swipl.1 swipl.sh swipl.pc"
+OutputFiles="Makefile libtai/Makefile ../man/Makefile swipl.1 swipl.sh swipl.pc"
 
 case "$PLARCH" in
     i386-win32|x64-win64)
