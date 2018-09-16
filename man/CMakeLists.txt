@@ -163,6 +163,25 @@ add_custom_command(
     COMMAND touch manual.html
     DEPENDS ${TEXFILES} ${CMAKE_CURRENT_BINARY_DIR}/${DOC}.bbl)
 
+doc2tex(windows.tex)
+add_custom_command(
+    OUTPUT windows.html
+    COMMAND ${LATEX2HTML} windows
+    DEPENDS ${CMAKE_CURRENT_BINARY_DIR}/windows.tex)
+
+add_custom_command(
+    OUTPUT  macosx/macosx.tex
+    COMMAND ${CMAKE_COMMAND} -E make_directory macosx
+    COMMAND ${DOC2TEX} ${CMAKE_CURRENT_SOURCE_DIR}/macosx/macosx.doc
+                       > macosx/macosx.tex
+    DEPENDS macosx/macosx.doc)
+
+add_custom_command(
+    OUTPUT  macosx/macosx.html
+    COMMAND ${LATEX2HTML} macosx
+    DEPENDS ${CMAKE_CURRENT_BINARY_DIR}/macosx/macosx.tex
+    WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/macosx)
+
 ################
 # Targets
 
@@ -172,6 +191,12 @@ add_custom_target(
 add_custom_target(
     core.doc.pdf
     DEPENDS ${CMAKE_CURRENT_BINARY_DIR}/${DOC}.pdf)
+add_custom_target(
+    core.doc.windows.html
+    DEPENDS ${CMAKE_CURRENT_BINARY_DIR}/windows.html)
+add_custom_target(
+    core.doc.macosx.html
+    DEPENDS ${CMAKE_CURRENT_BINARY_DIR}/macosx/macosx.html)
 
 # Add to the toplevel `doc` target
 add_dependencies(doc core.doc.pdf core.doc.html)
