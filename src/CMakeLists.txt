@@ -345,3 +345,9 @@ install(DIRECTORY DESTINATION bin)
 ilink(${SWIPL_INSTALL_ARCH_EXE}/swipl
       ${CMAKE_INSTALL_PREFIX}/bin/swipl)
 endif(WIN32)
+
+# Final update of library indexes
+
+run_installed_swipl(
+	make
+	COMMENT "-- Updating library indexes")

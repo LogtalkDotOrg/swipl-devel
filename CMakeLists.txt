@@ -3,6 +3,7 @@ project(SWI-Prolog)
 
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
 include(Version)
+include(QLF)
 
 # Default location to install SWI-Prolog (for now)
 if(IS_DIRECTORY "$ENV{SWIPL_INSTALL_PREFIX}")
