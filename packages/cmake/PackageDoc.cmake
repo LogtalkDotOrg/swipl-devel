@@ -26,12 +26,12 @@ function(txt2tex file)
   set(texfiles ${texfiles} ${tex} PARENT_SCOPE)
 endfunction()
 
-function(copy_image img)
+function(copy_file file)
   add_custom_command(
-      OUTPUT ${img}
+      OUTPUT ${file}
       COMMAND ${CMAKE_COMMAND} -E copy_if_different
-              ${CMAKE_CURRENT_SOURCE_DIR}/${img} ${img})
-  set(images ${images} ${img} PARENT_SCOPE)
+              ${CMAKE_CURRENT_SOURCE_DIR}/${file} ${file})
+  set(cpfiles ${cpfiles} ${file} PARENT_SCOPE)
 endfunction()
 
 
@@ -96,7 +96,7 @@ function(pkg_doc pkg)
   set(docfiles)
   set(mode)
   set(texfiles)
-  set(images)
+  set(cpfiles)
   set(src)
   set(seclevel)
   set(libsubdir)
@@ -135,8 +135,8 @@ function(pkg_doc pkg)
         doc2tex(${arg})
       elseif(arg MATCHES "\\.txt")
         txt2tex(${arg})
-      elseif(arg MATCHES "\\.(gif|pdf|eps)")
-        copy_image(${arg})
+      elseif(arg MATCHES "\\.(gif|pdf|eps|bib)")
+        copy_file(${arg})
       elseif(arg MATCHES "\\.tex")
         set(texfiles ${texfiles} ${arg})
       endif()
@@ -148,7 +148,7 @@ function(pkg_doc pkg)
 
   tex_byproducts(${pkg} byproducts)
 
-  prepend(texdeps ${CMAKE_CURRENT_BINARY_DIR}/ ${pkg}.tex ${texfiles} ${images})
+  prepend(texdeps ${CMAKE_CURRENT_BINARY_DIR}/ ${pkg}.tex ${texfiles} ${cpfiles})
 
   add_custom_command(
       OUTPUT ${pkg}.pdf

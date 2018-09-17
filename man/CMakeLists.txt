@@ -149,6 +149,14 @@ add_custom_command(
     COMMAND ${DOC2TEX} ${DOC}.doc > ${DOC}.tex
     DEPENDS ${CMAKE_CURRENT_BINARY_DIR}/${DOC}.doc)
 
+set(BIBTEX_DATA ${CMAKE_CURRENT_BINARY_DIR}/pl.bib)
+
+add_custom_command(
+    OUTPUT pl.bib
+    COMMAND ${CMAKE_COMMAND} -E copy_if_different
+	    ${CMAKE_CURRENT_SOURCE_DIR}/pl.bib .
+    DEPENDS pl.bib)
+
 # Collect all input files
 prepend(TEXFILES ${CMAKE_CURRENT_BINARY_DIR}/ ${DOC}.tex ${DOC_CORE} ${TEX_LIB})
 # Collect by products
@@ -159,7 +167,7 @@ tex_byproducts(${DOC} TEX_BYPRODUCTS)
 add_custom_command(
     OUTPUT  ${DOC}.pdf
     COMMAND env TEXINPUTS=lib:$$TEXINPUTS ${RUNTEX} --pdf ${DOC}
-    DEPENDS ${TEXFILES}
+    DEPENDS ${TEXFILES} ${BIBTEX_DATA}
     BYPRODUCTS ${TEX_BYPRODUCTS} ${AUX_FILES}
     COMMENT "Generating ${DOC}.pdf")
 
