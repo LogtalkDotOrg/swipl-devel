@@ -20,6 +20,13 @@ option(INSTALL_DOCUMENTATION
        "Install the HTML documentation files"
        ON)
 
+# Prefer MacPort packages
+if(APPLE)
+  message("-- Using Macports packages from /opt/local")
+  set(CMAKE_LIBRARY_PATH ${CMAKE_LIBRARY_PATH} /opt/local/lib)
+  set(CMAKE_INCLUDE_PATH ${CMAKE_INCLUDE_PATH} /opt/local/include)
+endif()
+
 # Installation locations
 string(TOLOWER ${CMAKE_HOST_SYSTEM_PROCESSOR}-${CMAKE_HOST_SYSTEM_NAME}
        SWIPL_ARCH)
