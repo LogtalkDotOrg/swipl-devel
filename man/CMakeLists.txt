@@ -165,7 +165,7 @@ tex_byproducts(${DOC} TEX_BYPRODUCTS)
 
 # Build SWI-Prolog-<version>.pdf
 add_custom_command(
-    OUTPUT  ${DOC}.pdf
+    OUTPUT  ${DOC}.pdf ${DOC}.bbl
     COMMAND env TEXINPUTS=lib:$$TEXINPUTS ${RUNTEX} --pdf ${DOC}
     DEPENDS ${TEXFILES} ${BIBTEX_DATA}
     BYPRODUCTS ${TEX_BYPRODUCTS} ${AUX_FILES}
