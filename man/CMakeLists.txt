@@ -50,10 +50,19 @@ set(STYFILES html.sty txt.sty)
 function(doc2tex)
   foreach(f ${ARGN})
     string(REGEX REPLACE "\\.tex" ".doc" docin ${f})
-    add_custom_command(
-	OUTPUT ${f}
-	COMMAND ${DOC2TEX} ${CMAKE_CURRENT_SOURCE_DIR}/${docin} > ${f}
-	DEPENDS ${docin})
+    get_filename_component(dir ${f} DIRECTORY)
+    if(dir)
+      add_custom_command(
+	  OUTPUT ${f}
+	  COMMAND ${CMAKE_COMMAND} -E make_directory ${dir}
+	  COMMAND ${DOC2TEX} ${CMAKE_CURRENT_SOURCE_DIR}/${docin} > ${f}
+	  DEPENDS ${docin})
+    else()
+      add_custom_command(
+	  OUTPUT ${f}
+	  COMMAND ${DOC2TEX} ${CMAKE_CURRENT_SOURCE_DIR}/${docin} > ${f}
+	  DEPENDS ${docin})
+    endif()
   endforeach()
 endfunction()
 
