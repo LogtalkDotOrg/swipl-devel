@@ -260,6 +260,7 @@ add_library(libswipl ${LIBSWIPL_SRC} ${HDR_CORE})
 add_dependencies(libswipl version.h vmi-metadata core-constants)
 set_target_properties(libswipl PROPERTIES
 		      OUTPUT_NAME swipl
+		      MACOSX_RPATH TRUE
 		      VERSION ${SWIPL_VERSION_STRING}
 		      SOVERSION ${SWIPL_VERSION_MAJOR})
 target_include_directories(libswipl BEFORE PRIVATE
